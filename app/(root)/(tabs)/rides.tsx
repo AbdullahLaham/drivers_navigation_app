@@ -1,9 +1,23 @@
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { Calendar, Clock } from "lucide-react-native";
+import axios from 'axios';
+import API from '@/redux/features/MainApi';
 
 const Rides = () => {
   const [state, setState] = useState<any>("");
+  // const [requests, setRequests] = useState([]);
+
+  const getOrders = async () => {
+    // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
+    // console.log('res', res)
+    // setRequests(res?.data);
+  }
+
+  useEffect(() => {
+    getOrders();
+  }, []);
+
   const requests = [
     {
       id: 1,
@@ -29,9 +43,11 @@ const Rides = () => {
       price: '5 $',
       time: '12:5 pm',
     }
-  ]
+  ];
+
   return (
-    <View>
+    <ScrollView>
+      <View>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
         طلباتك
       </Text>
@@ -81,8 +97,8 @@ const Rides = () => {
                 <Text className='text-gray-400 my-2  text-lg'>{item?.endLoca}</Text>
                 
                 <View className='flex flex-row-reverse justify-between w-full'>
-                  <Text className='text-gray-500 text-lg'>{item?.date} <Calendar size={32} color="blue" /></Text>
-                  <Text className='text-gray-500 text-lg'>{item?.time} <Clock size={32} color="blue" /></Text>
+                  <View className='flex flex-row items-center'><Text className='text-gray-500 text-lg'>{item?.date} </Text><Calendar size={32} color="blue" /></View>
+                  <Text className='text-gray-500 text-lg'>{item?.time} </Text><Clock size={32} color="blue" />
                 </View>
                 <Text className='text-gray-500 text-lg'>{item?.price}</Text>
               </View>
@@ -94,6 +110,7 @@ const Rides = () => {
       </View>
 
     </View>
+    </ScrollView>
   )
 }
 

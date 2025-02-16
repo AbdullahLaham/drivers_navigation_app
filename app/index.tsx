@@ -5,9 +5,9 @@ import { Redirect } from 'expo-router'
 import enableRTL from "@/utils/rtlSetup";
 
 const Home = () => {
-    useEffect(() => {
-    enableRTL();
-  }, []);
+  //   useEffect(() => {
+  //   enableRTL();
+  // }, []);
   // return <Redirect href="/(auth)/welcome" />
   return <Redirect href="/(root)/(tabs)/home" />
 }

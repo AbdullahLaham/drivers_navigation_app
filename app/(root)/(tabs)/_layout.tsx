@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View } from "react-native";
 
 import { icons } from "@/constants";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const TabIcon = ({
   source,
@@ -11,7 +12,7 @@ const TabIcon = ({
   source: ImageSourcePropType;
   focused: boolean;
 }) => (
-  <View
+  <SafeAreaView
     className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-general-700" : ""}`}
   >
     <View
@@ -24,7 +25,7 @@ const TabIcon = ({
         className="w-7 h-7"
       />
     </View>
-  </View>
+  </SafeAreaView>
 );
 
 export default function Layout() {

@@ -12,7 +12,8 @@ export default function Page() {
   const mapRef = useRef<MapView>(null);
 
   const [inpuStartLocation, setInpuStartLocation] = useState('')
-  const [inpuEndLocation, setInpuEndLocation] = useState('')
+  const [inpuEndLocation, setInpuEndLocation] = useState('');
+
   const [startLocation, setStartLocation] = useState({
     latitude: 31.5003,
     longitude: 34.4662,
@@ -44,27 +45,27 @@ export default function Page() {
       "31.3246005"
     ]
   },
-  {
-    "place_id": 41861832,
-    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-    "osm_type": "node",
-    "osm_id": 432191180,
-    "lat": "31.5336282",
-    "lon": "35.0979762",
-    "class": "amenity",
-    "type": "university",
-    "place_rank": 30,
-    "importance": 0.3448456713926686,
-    "addresstype": "amenity",
-    "name": "جامعة بوليتكنيك فلسطين",
-    "display_name": "جامعة بوليتكنيك فلسطين, شارع عين خير الدين, الخليل, المدينة القديمة, مركز المدينة, الخليل, منطقة H1, الضفة الغربية, 150, Palestinian Territory",
-    "boundingbox": [
-      "31.5335782",
-      "31.5336782",
-      "35.0979262",
-      "35.0980262"
-    ]
-  },
+  // {
+  //   "place_id": 41861832,
+  //   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+  //   "osm_type": "node",
+  //   "osm_id": 432191180,
+  //   "lat": "31.5336282",
+  //   "lon": "35.0979762",
+  //   "class": "amenity",
+  //   "type": "university",
+  //   "place_rank": 30,
+  //   "importance": 0.3448456713926686,
+  //   "addresstype": "amenity",
+  //   "name": "جامعة بوليتكنيك فلسطين",
+  //   "display_name": "جامعة بوليتكنيك فلسطين, شارع عين خير الدين, الخليل, المدينة القديمة, مركز المدينة, الخليل, منطقة H1, الضفة الغربية, 150, Palestinian Territory",
+  //   "boundingbox": [
+  //     "31.5335782",
+  //     "31.5336782",
+  //     "35.0979262",
+  //     "35.0980262"
+  //   ]
+  // },
   {
     "place_id": 42016742,
     "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
@@ -90,33 +91,54 @@ export default function Page() {
   const [locationPermission, setLocationPermission] = useState(false);
 
 
-  useEffect(() => {
-    requestLocationPermission();
-  }, []);
 
 
 
-  const requestLocationPermission = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Please enable location services.");
-      return;
-    }
-    setLocationPermission(true);
-    getCurrentLocation();
-  };
+  // const requestLocationPermission = async () => {
+  //   const { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     Alert.alert("Permission Denied", "Please enable location services.");
+  //     return;
+  //   }
+  //   setLocationPermission(true);
+  //   getCurrentLocation();
+  // };
 
-  const getCurrentLocation = async () => {
-    if (!locationPermission) return;
-    const location = await Location.getCurrentPositionAsync({});
-    console.log(location, 'location')
-    setStartLocation({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
-  };
+  // const getCurrentLocation = async () => {
+  //   if (!locationPermission) return;
+  //   const location = await Location.getCurrentPositionAsync({});
+  //   console.log("الموقع الحالي:", location.coords);
+  //   console.log(location, 'location')
+  //   setStartLocation({
+  //     latitude: location.coords.latitude,
+  //     longitude: location.coords.longitude,
+  //   });
+  //   const newRegion = {
+  //     latitude: location.coords.latitude,
+  //     longitude: location.coords.longitude,
+  //     latitudeDelta: 0.01,
+  //     longitudeDelta: 0.01,
+  //   };
+  //   mapRef.current?.animateToRegion(newRegion, 1000);
+
+  // };
+  
+  const selectNewLocation = (region: any) => {
+
+    const newRegion = {
+      latitude: parseFloat(region?.lat),
+      longitude: parseFloat(region?.lon),
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+    mapRef.current?.animateToRegion(newRegion, 1000);
+  }
+
+
+
 
   const searchPlaces = async (text: string) => {
+
     // setQuery(text);
     if (text.length > 3) {
       console.log('Fetching data...');
@@ -136,23 +158,82 @@ export default function Page() {
   };
 
   // create new Ride
-  const onCreateRide = () => {
+  const onCreateRide = async () => {
     alert("تم تأكيد الرحلة");
+    const res = await axios.post('https://ajwan.mahmoudalbatran.com/api/orders', {
+      from: inpuStartLocation,
+      to: inpuEndLocation,
+    });
+
+    console.log('res', res);
+
   }
 
+  // useEffect(() => {
+  //   requestLocationPermission();
+  // }, []);
+  // useEffect(() => {
+  //   const fetchLocation = async () => {
+  //     await getCurrentLocation();
+  //   };
+  
+  //   fetchLocation();
+  // }, []);
+  
+  // useEffect(() => {
+  //   if (mapRef.current && startLocation) {
+  //     mapRef?.current?.animateToRegion({
+  //     latitude: startLocation.latitude,
+  //     longitude: startLocation.longitude,
+  //     latitudeDelta: 0.01,
+  //     longitudeDelta: 0.01,
+  //   });
+  //   }
+    
+  // }, [startLocation]);
+  
+
+
+  useEffect(() => {
+    const requestLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Please enable location services.");
+        return;
+      }
+      setLocationPermission(true);
+
+      // بعد السماح بالموقع، جلب الموقع الحالي
+      const location = await Location.getCurrentPositionAsync({});
+      setStartLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      mapRef.current?.animateToRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }, 1000);
+    };
+
+    requestLocation();
+  }, []);
 
   return (
     <View className="flex-1 relative ">
       {/* 🔍 مربع البحث */}
+      
+
+      <View className="absolute top-0 left-0 right-0    z-10 ">
       <TextInput
         // dir='rtl'
-        className="w-full py-2 px-3 my-1 border-none outline-none placeholder:"
+        className=" w-full h-[3rem] py-2 mt-[3rem] px-3 my-1 border-none outline-none bg-gray-100 placeholder:text-gray-600"
         placeholder="ابحث عن موقع..."
         value={query}
         onChangeText={(text) => { setQuery(text); console.log(query, 'qq'); searchPlaces(query) }}
       />
-
-      <View className="">
         {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
@@ -161,8 +242,9 @@ export default function Page() {
               <TouchableOpacity
                 style={styles.suggestionItem}
                 onPress={() => {
+                  selectNewLocation(item);
                   setSelectedSug(item);
-                  setChangeLoc(true)
+                  // setChangeLoc(true);
                   setEndLocation({
                     latitude: parseFloat(item?.lat),
                     longitude: parseFloat(item?.lon),
@@ -172,7 +254,7 @@ export default function Page() {
                     longitude: parseFloat(item?.lon),
                   })
                   setQuery(item.display_name);
-                  // setSuggestions([]);
+                  setSuggestions([]);
                 }}
               >
                 <Text>{item?.display_name}</Text>
@@ -183,23 +265,49 @@ export default function Page() {
       </View>
 
       {/* 🗺️ الخريطة */}
+      <MapView
+      ref={mapRef}
+        style={styles.map}
+        initialRegion={{
+          latitude: startLocation?.latitude,
+          longitude: startLocation?.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}
+      >
+        {/* نقطة البداية */}
+        {/* {startLocation && <Marker coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />} */}
+        
+        {startLocation?.latitude && startLocation?.longitude && (
+          <Marker coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />
+        )}
+
+        {/* نقطة الوجهة (endLocation) */}
+        {endLocation && <Marker coordinate={endLocation} title="الموقع المحدد" pinColor="red" />}
+
+        {/* خط المسار بين البداية والنهاية */}
+        {endLocation && (
+          <Polyline
+            coordinates={[startLocation, endLocation]}
+            strokeColor="blue"
+            strokeWidth={3}
+          />
+        )}
+      </MapView>
 
 
 
       {/* 📌  بيانات الرحلة */}
-      <View className="mt-auto mb-[5rem]">
-        <View className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2">
-          <TextInput className="rounded-md placeholder:text-gray-600 placeholder:text-end placeholder:text-lg my-1 border-none outline-none flex-1 bg-gray-200 w-full py-2 px-3" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
-        </View>
-        <View className="flex flex-raw-reverse items-center justify-start gap-1  rounded-md mx-2">
+      <View className="mt-auto mb-[5rem] flex flex-col ">
+      {/* className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2" */}
+          <TextInput className="rounded-md placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200 w-full  h-[4rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
           <TextInput
-            className="rounded-md  placeholder:text-gray-600 placeholder:text-end placeholder:text-lg my-1 border-none outline-none flex-1 bg-gray-200 w-full py-2 px-3"
+            className="rounded-md  placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200 w-full  h-[4rem]"
             // value={query}
             value={inpuEndLocation}
             onChangeText={(text) => setInpuEndLocation(text)}
             placeholder="الوجهة"
           />
-        </View>
 
         {/* <Text>المسافة: 🚗 (يتم الحساب...) | الوقت: ⏳ | السعر: 💰</Text> */}
         <Button title="تأكيد الرحلة" onPress={() => onCreateRide()} />
