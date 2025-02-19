@@ -97,29 +97,54 @@ export const icons = {
 // ];
 
 
+// export const onboarding = [
+//     {
+//         id: 1,
+//         title: "التوصيل المثالي بلمسة زر!",
+//         description:
+//             "رحلة تسوقك تبدأ مع MallToAll. اطلب ما تحتاجه، وسنوصله إليك بسرعة وسهولة.",
+//         image: images.onboarding1,
+//     },
+//     {
+//         id: 2,
+//         title: "كل ما تحتاجه بين يديك!",
+//         description:
+//             "اكتشف راحة التسوق عبر تطبيق MallToAll، واحصل على منتجاتك بأسرع وقت.",
+//         image: images.onboarding2,
+//     },
+//     {
+//         id: 3,
+//         title: "طلبك جاهز.. دعنا نوصل!",
+//         description:
+//             "حدد موقعك، اختر ما تريد، واترك الباقي علينا. نحن هنا لخدمتك!",
+//         image: images.onboarding3,
+//     },
+// ];
+
+
 export const onboarding = [
     {
-        id: 1,
-        title: "التوصيل المثالي بلمسة زر!",
-        description:
-            "رحلة تسوقك تبدأ مع MallToAll. اطلب ما تحتاجه، وسنوصله إليك بسرعة وسهولة.",
-        image: images.onboarding1,
+      id: 1,
+      title: "الرحلة المثالية بلمسة زر!",
+      description: "رحلتك تبدأ مع أجوان. ابحث عن رحلتك المثالية بكل سهولة.",
+      image: images.onboarding1,
     },
     {
-        id: 2,
-        title: "كل ما تحتاجه بين يديك!",
-        description:
-            "اكتشف راحة التسوق عبر تطبيق MallToAll، واحصل على منتجاتك بأسرع وقت.",
-        image: images.onboarding2,
+      id: 2,
+      title: "أفضل سيارة بين يديك مع أجوان",
+      description: "اكتشف سهولة العثور على رحلتك المثالية مع أجوان.",
+      image: images.onboarding2,
     },
     {
-        id: 3,
-        title: "طلبك جاهز.. دعنا نوصل!",
-        description:
-            "حدد موقعك، اختر ما تريد، واترك الباقي علينا. نحن هنا لخدمتك!",
-        image: images.onboarding3,
+      id: 3,
+      title: "رحلتك بطريقتك. هيا ننطلق!",
+      description: "أدخل وجهتك، استرخِ، واترك لنا الباقي.",
+      image: images.onboarding3,
     },
-];
+  ];
+  
+
+
 export const data = {
     onboarding,
 };

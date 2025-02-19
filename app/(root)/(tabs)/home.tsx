@@ -4,8 +4,12 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOp
 import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
+import API from "@/redux/features/MainApi";
+import { useSelector } from "react-redux";
 
 export default function Page() {
+  // current user
+  const {currentUser: user} = useSelector((state: any) => state?.auth);
 
   const [changeLoc, setChangeLoc] = useState(false);
 
@@ -159,13 +163,32 @@ export default function Page() {
 
   // create new Ride
   const onCreateRide = async () => {
-    alert("تم تأكيد الرحلة");
-    const res = await axios.post('https://ajwan.mahmoudalbatran.com/api/orders', {
-      from: inpuStartLocation,
-      to: inpuEndLocation,
+    try {
+      console.log({
+        from: inpuStartLocation,
+        to: inpuEndLocation,
+      })
+      const res = await axios.post('https://ajwan.mahmoudalbatran.com/api/orders', {
+        from: inpuStartLocation,
+        to: inpuEndLocation,
+      },
+    {
+     headers: {
+      Authorization: `Bearer ${user?.token}`
+     } 
     });
 
     console.log('res', res);
+    if (res?.data) {
+      setInpuEndLocation("");
+      setInpuEndLocation("");
+        alert("تم تأكيد الرحلة");
+    }
+
+    } catch(error) {
+
+    }
+
 
   }
 
@@ -192,7 +215,7 @@ export default function Page() {
     
   // }, [startLocation]);
   
-
+console.log(user, 'usere')
 
   useEffect(() => {
     const requestLocation = async () => {
@@ -220,6 +243,20 @@ export default function Page() {
 
     requestLocation();
   }, []);
+
+
+
+  // useEffect(() => {
+  //   if (mapRef.current && startLocation) {
+  //     mapRef.current.animateToRegion({
+  //       latitude: startLocation.latitude,
+  //       longitude: startLocation.longitude,
+  //       latitudeDelta: 0.01,
+  //       longitudeDelta: 0.01,
+  //     }, 1000);
+  //   }
+  // }, [startLocation]);
+  
 
   return (
     <View className="flex-1 relative ">
@@ -264,7 +301,6 @@ export default function Page() {
         )}
       </View>
 
-      {/* 🗺️ الخريطة */}
       <MapView
       ref={mapRef}
         style={styles.map}
@@ -279,11 +315,11 @@ export default function Page() {
         {/* {startLocation && <Marker coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />} */}
         
         {startLocation?.latitude && startLocation?.longitude && (
-          <Marker coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />
+          <Marker key={`${startLocation.latitude}-${startLocation.longitude}`} coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />
         )}
 
         {/* نقطة الوجهة (endLocation) */}
-        {endLocation && <Marker coordinate={endLocation} title="الموقع المحدد" pinColor="red" />}
+        {endLocation && <Marker key={`${startLocation.latitude}-${startLocation.longitude}`} coordinate={endLocation} title="الموقع المحدد" pinColor="red" />}
 
         {/* خط المسار بين البداية والنهاية */}
         {endLocation && (
@@ -294,6 +330,8 @@ export default function Page() {
           />
         )}
       </MapView>
+
+    
 
 
 

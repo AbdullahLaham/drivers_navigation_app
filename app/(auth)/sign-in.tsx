@@ -14,13 +14,9 @@ const SignIn = () => {
 
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const {currentUser} = useSelector((state: any) => state?.auth)
-  useEffect(() => {
-    if (currentUser?.client?.name) {
-      router.push(`/(root)/(tabs)/home`);
+  const {currentUser} = useSelector((state: any) => state?.auth);
 
-    }
-  })
+
   // const { signIn, setActive, isLoaded } = useSignIn();
 
   const [form, setForm] = useState({
@@ -57,6 +53,12 @@ const SignIn = () => {
       Alert.alert("Error", err.errors[0].longMessage);
     }
   }, [ form]);
+  useEffect(() => {
+    if (currentUser?.client?.name) {
+      router.push(`/(root)/(tabs)/home`);
+
+    }
+  }, [])
 
   return (
     <ScrollView className="flex-1 bg-white">

@@ -8,8 +8,10 @@ const Home = () => {
   //   useEffect(() => {
   //   enableRTL();
   // }, []);
-  // return <Redirect href="/(auth)/welcome" />
-  return <Redirect href="/(root)/(tabs)/home" />
+
+  return <Redirect href="/(auth)/welcome" />
+  
+  // return <Redirect href="/(root)/(tabs)/home" />
 }
 
 export default Home

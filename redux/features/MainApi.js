@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { toast } from "sonner";
 
-const API = axios.create({ baseURL: 'https://malltoall.mahmoudalbatran.com' });
+const API = axios.create({ baseURL: 'https://ajwan.mahmoudalbatran.com/api' });
 
 const getData = async (key) => {
   try {

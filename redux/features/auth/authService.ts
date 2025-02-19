@@ -5,7 +5,7 @@ import axios from "axios";
 
 const login = async (user: any) => {
     try {
-       const res =  await API.post('/api/auth/users', user);
+       const res =  await API.post('/auth/login', user);
        if (res.data) {
         await AsyncStorage.setItem("user", JSON.stringify(user));
         
@@ -28,7 +28,7 @@ const signUp = async (user: any) => {
         //     headers: { "Content-Type": "application/json" },
         //     body: JSON.stringify(user),
         //   });
-          const res = await API.post('/api/auth/create', user)
+          const res = await API.post('/auth/create', user);
           console.log('data', res?.data);
 
         // const data = res.json();

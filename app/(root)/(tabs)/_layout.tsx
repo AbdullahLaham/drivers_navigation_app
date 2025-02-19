@@ -22,7 +22,7 @@ const TabIcon = ({
         source={source}
         tintColor="white"
         resizeMode="contain"
-        className="w-7 h-7"
+        className="w-10 h-10"
       />
     </View>
   </SafeAreaView>
@@ -39,12 +39,12 @@ export default function Layout() {
         tabBarStyle: {
           backgroundColor: "transparent",
           borderRadius: 50,
-          paddingBottom: 0, // ios only
+          paddingBottom: 20, // ios only
           paddingTop: 0,
           overflow: "hidden",
           marginHorizontal: 20,
           marginBottom: 10,
-          height: 50,
+          height: 60,
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
@@ -54,7 +54,8 @@ export default function Layout() {
       }}
     >
   
-  
+      
+
       <Tabs.Screen
         name="home"
         options={{
@@ -75,13 +76,15 @@ export default function Layout() {
           ),
         }}
       />
+      
+      
       <Tabs.Screen
-        name="chat"
+        name="prices"
         options={{
-          title: "Chat",
+          title: "Prices",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.chat} focused={focused} />
+            <TabIcon source={icons.dollar} focused={focused} />
           ),
         }}
       />
@@ -92,6 +95,16 @@ export default function Layout() {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <TabIcon source={icons.profile} focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: "Chat",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon source={icons.chat} focused={focused} />
           ),
         }}
       />
