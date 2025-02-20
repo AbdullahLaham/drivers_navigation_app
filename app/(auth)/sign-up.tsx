@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
@@ -16,7 +16,7 @@ const SignUp = () => {
   // const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const dispatch = useAppDispatch();
-  const {currentUser} = useSelector((state: any) => state?.auth)
+  const {currentUser: user} = useSelector((state: any) => state?.auth)
 
   const [form, setForm] = useState({
     name: "",
@@ -37,16 +37,25 @@ const SignUp = () => {
     // });
     // console.log('hiiiiiiiiiii')
 
-    dispatch(register(
-      {
-        name: form?.name,
-        email: form?.email,
-        password: form?.password
-      }
-    ));
-    
-
     try {
+
+      const res = dispatch(register(
+        {
+          name: form?.name,
+          email: form?.email,
+          password: form?.password
+        }
+      ));
+
+
+      console.log('logres', );
+      const client = await res;
+
+      if (client?.payload?.client?.email) {
+        router.push(`/(root)/(tabs)/home`);
+      }
+      
+
     } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
@@ -54,6 +63,15 @@ const SignUp = () => {
       Alert.alert("Error", err.errors[0].longMessage);
     }
   };
+
+  // useEffect(() => {
+  //   if (user?.client?.name) {
+  //     router.push(`/(root)/(tabs)/home`);
+
+  //   }
+  // }, []);
+
+  
   const onPressVerify = async () => {
     // if (!isLoaded) return;
     try {

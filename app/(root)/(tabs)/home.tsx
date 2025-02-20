@@ -330,6 +330,8 @@ console.log(user, 'usere')
           />
         )}
       </MapView>
+      
+
 
     
 

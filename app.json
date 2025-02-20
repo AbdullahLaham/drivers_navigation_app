@@ -46,6 +46,12 @@
         "projectId": "2aa8d1e9-4ad7-4d0f-b8fe-6b8e8e6fc32c"
       }
     },
-    "owner": "abdullah_lahham123"
+    "owner": "abdullah_lahham123",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2aa8d1e9-4ad7-4d0f-b8fe-6b8e8e6fc32c"
+    }
   }
 }

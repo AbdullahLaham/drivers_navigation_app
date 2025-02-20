@@ -30,6 +30,7 @@ const signUp = async (user: any) => {
         //   });
           const res = await API.post('/auth/create', user);
           console.log('data', res?.data);
+          
 
         // const data = res.json();
 

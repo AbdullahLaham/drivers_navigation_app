@@ -29,10 +29,17 @@ const SignIn = () => {
 
     try {
 
-      dispatch(login({
+      const res = dispatch(login({
         email: form?.email,
         password: form?.password,
       }));
+      console.log('logres', );
+      const client = await res;
+
+      if (client?.payload?.client?.email) {
+        router.push(`/(root)/(tabs)/home`);
+      }
+
 
       // const signInAttempt = await signIn.create({
       //   identifier: form.email,
@@ -53,12 +60,9 @@ const SignIn = () => {
       Alert.alert("Error", err.errors[0].longMessage);
     }
   }, [ form]);
-  useEffect(() => {
-    if (currentUser?.client?.name) {
-      router.push(`/(root)/(tabs)/home`);
 
-    }
-  }, [])
+ 
+
 
   return (
     <ScrollView className="flex-1 bg-white">

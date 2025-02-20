@@ -1,6 +1,6 @@
 import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Calendar, Clock, Flag, MapPin, MapPinOff, Target } from "lucide-react-native";
+import { Calendar, Calendar1Icon, CalendarDaysIcon, CalendarPlus, Clock, Flag, MapPin, MapPinOff, Target } from "lucide-react-native";
 import { format, parseISO } from "date-fns";
 import axios from 'axios';
 import API from '@/redux/features/MainApi';
@@ -138,7 +138,7 @@ const Rides = () => {
                 
                 
                 <View className='flex flex-row-reverse items-center justify-between w-full '>
-                  <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><Calendar size={27} color="gray" /></View>
+                  <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><CalendarDaysIcon size={27} color="gray" /></View>
                   <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text><Clock size={28} color="gray" className='font-bold' /></View>
                 </View>
                 <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
