@@ -181,7 +181,7 @@ export default function Page() {
     console.log('res', res);
     if (res?.data) {
       setInpuEndLocation("");
-      setInpuEndLocation("");
+      setInpuStartLocation("");
         alert("تم تأكيد الرحلة");
     }
 
@@ -245,7 +245,6 @@ console.log(user, 'usere')
   }, []);
 
 
-
   // useEffect(() => {
   //   if (mapRef.current && startLocation) {
   //     mapRef.current.animateToRegion({
@@ -263,15 +262,15 @@ console.log(user, 'usere')
       {/* 🔍 مربع البحث */}
       
 
-      <View className="absolute top-0 left-0 right-0    z-10 ">
+      <View className="absolute -top-7 left-0 right-0    z-10 ">
       <TextInput
         // dir='rtl'
-        className=" w-full h-[3rem] py-2 mt-[3rem] px-3 my-1 border-none outline-none bg-gray-100 placeholder:text-gray-600"
+        className=" w-full h-[3rem] py-3 mt-[3rem] px-3 my-1 border-none outline-none bg-gray-100 placeholder:text-gray-600"
         placeholder="ابحث عن موقع..."
         value={query}
         onChangeText={(text) => { setQuery(text); console.log(query, 'qq'); searchPlaces(query) }}
       />
-        {suggestions.length > 0 && (
+        {/* {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
             keyExtractor={(item: any) => item?.place_id}
@@ -298,7 +297,7 @@ console.log(user, 'usere')
               </TouchableOpacity>
             )}
           />
-        )}
+        )} */}
       </View>
 
       <MapView

@@ -7,7 +7,7 @@ import API from '@/redux/features/MainApi';
 import { useSelector } from 'react-redux';
 
 const Rides = () => {
-  const [state, setState] = useState<any>("");
+  const [state, setState] = useState<any>("pending");
   const [requests, setRequests] = useState([]);
 
   // current user
@@ -123,7 +123,7 @@ const Rides = () => {
         {/* <search /> */}
 
       </View>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر 9/2023</Text>
+      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {format(requests[requests.length - 1]['created_at'], "MM/yyyy")}</Text>
       <View className='px-3'>
         
         {requests.length > 0 && (
@@ -132,14 +132,14 @@ const Rides = () => {
             keyExtractor={(item: any) => item?.id}
             renderItem={({ item }) => (
               <View className='w-[100%] flex flex-col items-end justify-start mb-3 border-b r border-gray-400 p-1 rounded-sm'>
-                <View className='flex items-center flex-row-reverse gap-2'><MapPin color="green" size={20} /><Text className='text-gray-400 my-1  text-sm'>{item?.from}</Text></View>
-                <View className='flex items-center flex-row-reverse gap-2'><Target color="red" size={20} /><Text className='text-gray-400 my-1  text-sm'>{item?.to}</Text></View>
+                <View className='flex items-center flex-row-reverse gap-2'><MapPin color="green" size={20} /><Text className='text-gray-400 my-1  text-md'>{item?.from}</Text></View>
+                <View className='flex items-center flex-row-reverse gap-2'><Target color="red" size={20} /><Text className='text-gray-400 my-1  text-md'>{item?.to}</Text></View>
                 
                 
                 
                 <View className='flex flex-row-reverse items-center justify-between w-full '>
-                  <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><CalendarDaysIcon size={27} color="gray" /></View>
-                  <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text><Clock size={28} color="gray" className='font-bold' /></View>
+                  <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><CalendarDaysIcon size={22} color="gray" /></View>
+                  <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text><Clock size={22} color="gray" className='font-bold' /></View>
                 </View>
                 <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
 

@@ -51,9 +51,11 @@ const SignUp = () => {
       console.log('logres', );
       const client = await res;
 
-      if (client?.payload?.client?.email) {
+      if (client?.payload) {
+        alert('client created successfully');
         router.push(`/(root)/(tabs)/home`);
       }
+
       
 
     } catch (err: any) {
