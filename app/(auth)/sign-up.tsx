@@ -55,15 +55,14 @@ const SignUp = () => {
       ));
 
 
-      console.log('logres', );
       const client = await res;
 
-      console.log(client?.payload, 'pppp');
+      // console.log(client?.payload, 'pppp');
 
       if (client?.payload?.data) {
         // alert('client created successfully');
         setErrorMessage("");
-        console.log(client?.payload);
+        // console.log(client?.payload);
         setLoading(false);
         router.push(`/(root)/(tabs)/home`);
       } else {

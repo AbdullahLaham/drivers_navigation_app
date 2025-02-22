@@ -19,7 +19,7 @@ const Rides = () => {
     const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/orders',
   {
    headers: {
-    Authorization: `Bearer ${user?.token}`
+    Authorization: `Bearer ${user?.data?.token}`
    } 
   });
   setRequests(res?.data?.orders);
@@ -86,7 +86,6 @@ const Rides = () => {
   // ];
 
   return (
-    <ScrollView>
       <View>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
         طلباتك
@@ -126,7 +125,6 @@ const Rides = () => {
 
       </View>
       <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
-      <ScrollView className='px-3'>
         
         {requests.length > 0 && (
           <FlatList
@@ -159,10 +157,8 @@ const Rides = () => {
         )}
 
 
-      </ScrollView>
 
     </View>
-    </ScrollView>
   )
 }
 

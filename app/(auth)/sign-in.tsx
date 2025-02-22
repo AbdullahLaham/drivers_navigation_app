@@ -39,10 +39,9 @@ const SignIn = () => {
         email: form?.email,
         password: form?.password,
       }));
-      console.log('logres', );
       const client = await res;
 
-      console.log('res', client?.payload?.data?.email);
+      // console.log('res', client?.payload?.data?.email);
 
       if (client?.payload?.data) {
         router.push(`/(root)/(tabs)/home`);
@@ -75,6 +74,11 @@ const SignIn = () => {
     }
   }, [ form]);
 
+  useEffect(() => {
+    if (user?.data?.token) {
+      router.push(`/(root)/(tabs)/home`);
+    }
+  }, []);
  
 
 

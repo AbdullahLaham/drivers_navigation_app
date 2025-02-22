@@ -6,7 +6,7 @@ import * as Location from "expo-location";
 import axios from "axios";
 import API from "@/redux/features/MainApi";
 import { useSelector } from "react-redux";
-import { Loader } from "lucide-react-native";
+import { Loader, Pin, PinIcon, Target } from "lucide-react-native";
 
 export default function Page() {
   // current user
@@ -18,6 +18,7 @@ export default function Page() {
 
   const [inpuStartLocation, setInpuStartLocation] = useState('')
   const [inpuEndLocation, setInpuEndLocation] = useState('');
+  const [currentLocation, setCurrentLocation] = useState('')
 
   const [startLocation, setStartLocation] = useState({
     latitude: 31.5003,
@@ -25,7 +26,7 @@ export default function Page() {
   });
   const [endLocation, setEndLocation] = useState<any | null>(null);
 
-  console.log(startLocation, endLocation);
+  // console.log(startLocation, endLocation);
   const [selectedSug, setSelectedSug] = useState<any | null>(null)
   const [query, setQuery] = useState("");
 
@@ -164,6 +165,7 @@ export default function Page() {
 
   // create new Ride
   const onCreateRide = async () => {
+    console.log(user?.data?.token, 'token');
     try {
       console.log({
         from: inpuStartLocation,
@@ -175,7 +177,7 @@ export default function Page() {
       },
     {
      headers: {
-      Authorization: `Bearer ${user?.token}`
+      Authorization: `Bearer ${user?.data?.token}`
      } 
     });
 
@@ -216,7 +218,23 @@ export default function Page() {
     
   // }, [startLocation]);
   
-console.log(user, 'usere')
+
+
+
+// const getLocationName = async (location: any) => {
+//   const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${location?.latitude}&lon=${location?.longitude}&format=json`);
+  
+//   console.log(res?.data, 'resres');
+
+//   setCurrentLocation(res?.data?.display_name  || "Location not found");
+
+//   return res?.data?.display_name;
+
+// }
+
+
+
+console.log('CurrentLocation', currentLocation);
 
   useEffect(() => {
     const requestLocation = async () => {
@@ -229,11 +247,16 @@ console.log(user, 'usere')
 
       // بعد السماح بالموقع، جلب الموقع الحالي
       const location = await Location.getCurrentPositionAsync({});
+      console.log(location, 'locat');
+      // setCurrentLocation(location);
+
       setStartLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
 
+      // getLocationName(startLocation);
+      
       mapRef.current?.animateToRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -332,9 +355,16 @@ console.log(user, 'usere')
         )}
       </MapView>
       {/* 📌  بيانات الرحلة */}
-      <View className="mt-auto mb-[5rem] flex flex-col ">
+      <View className="w-full mt-auto mb-[5rem] flex flex-col ">
       {/* className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2" */}
-          <TextInput className="rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
+      <View className="flex flex-row ">
+        <TouchableOpacity  onPress={() => { setInpuStartLocation(JSON.stringify(startLocation));  console.log('')}}>
+          <View className="bg-gray-300 mx-2 h-[3rem] w-[3rem] rounded-lg mt-1 flex items-center justify-center" >
+            <Target color="gray" size={25} className="text-red-500 bg-red-800" />
+          </View>
+        </TouchableOpacity>
+      <TextInput className="flex-1 rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
+      </View>
           <TextInput
             className="rounded-lg mx-2  placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]"
             // value={query}
