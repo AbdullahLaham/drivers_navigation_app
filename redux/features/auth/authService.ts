@@ -40,9 +40,9 @@ const signUp = async (user: any) => {
 
         return res?.data;
 
-    } catch (error) {
-        console.log(error)
-        throw new Error("something went wrong");            
+    } catch (error: any) {
+        console.log(error, 'errorserv');
+        throw new Error(error);            
     }
 }
 const getWishlist = async () => {

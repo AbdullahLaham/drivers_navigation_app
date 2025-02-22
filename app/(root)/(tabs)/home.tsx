@@ -6,6 +6,7 @@ import * as Location from "expo-location";
 import axios from "axios";
 import API from "@/redux/features/MainApi";
 import { useSelector } from "react-redux";
+import { Loader } from "lucide-react-native";
 
 export default function Page() {
   // current user
@@ -261,11 +262,12 @@ console.log(user, 'usere')
     <View className="flex-1 relative ">
       {/* 🔍 مربع البحث */}
       
+      
 
-      <View className="absolute -top-7 left-0 right-0    z-10 ">
+      <View className="absolute -top-10 left-0 right-0    z-10 ">
       <TextInput
         // dir='rtl'
-        className=" w-full h-[3rem] py-3 mt-[3rem] px-3 my-1 border-none outline-none bg-gray-100 placeholder:text-gray-600"
+        className="  h-[3rem] py-3 mt-[3rem]   px-3 my-1 border-none outline-none bg-gray-200 placeholder:text-gray-600 rounded-lg mx-2"
         placeholder="ابحث عن موقع..."
         value={query}
         onChangeText={(text) => { setQuery(text); console.log(query, 'qq'); searchPlaces(query) }}
@@ -329,19 +331,12 @@ console.log(user, 'usere')
           />
         )}
       </MapView>
-      
-
-
-    
-
-
-
       {/* 📌  بيانات الرحلة */}
       <View className="mt-auto mb-[5rem] flex flex-col ">
       {/* className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2" */}
-          <TextInput className="rounded-md placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200 w-full  h-[4rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
+          <TextInput className="rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
           <TextInput
-            className="rounded-md  placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200 w-full  h-[4rem]"
+            className="rounded-lg mx-2  placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]"
             // value={query}
             value={inpuEndLocation}
             onChangeText={(text) => setInpuEndLocation(text)}

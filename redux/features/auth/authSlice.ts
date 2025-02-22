@@ -2,6 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import authService from './authService';
 import {toast} from 'sonner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API from '../MainApi';
 
 type stateType = {
     currentUser: any,
@@ -12,6 +13,7 @@ type stateType = {
     isLoading: Boolean,
     isSuccess: Boolean,
     message: String,
+    error: string,
 }
 const getData = async (key: any) => {
     try {
@@ -32,15 +34,19 @@ const initialState: stateType = {
   isError: false,
   isLoading: false,
   isSuccess: false,
+  error: '',
   message: '',
 }
 
 export const login = createAsyncThunk('auth/login', async (user: any, thunkAPI) => {
   try {
-      return await authService.login(user);
+    //   return await authService.login(user);
+    const res =  await API.post('/auth/login', user);
+    return res;
+
       
-  } catch (error) {
-      return thunkAPI.rejectWithValue(error)
+  } catch (error: any) {
+      return thunkAPI.rejectWithValue(error?.response?.data?.message! || "حدث خطأ أثناء التسجيل");
   }
 
 });
@@ -48,12 +54,18 @@ export const login = createAsyncThunk('auth/login', async (user: any, thunkAPI) 
 
 export const register = createAsyncThunk('auth/register', async (user: any, thunkAPI) => {
   try {
-    console.log('hello from slice');
-      return await authService.signUp(user);
+    // service code
+    const res = await API.post('/auth/create', user);
+    return res;
+
+    //   return await authService.signUp(user);
       
       
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error?.response?.data?.message! || "Something went wrong");
+
+    const errorMessage = error?.response?.data?.message || "حدث خطأ أثناء التسجيل";
+      console.log(errorMessage, 'errorMessage' );
+    return thunkAPI.rejectWithValue(error?.response?.data?.message || "حدث خطأ أثناء التسجيل");
   }
 
 })
@@ -108,6 +120,7 @@ export const authSlice = createSlice({
         state.isError = false ;
         state.isSuccess = true;
         state.currentUser = action?.payload;
+        state.error = '';
         if (state?.isSuccess) {
             toast.success("user entered successfully");
         }
@@ -118,6 +131,7 @@ export const authSlice = createSlice({
         state.isError = true;
         state.isSuccess = false;
         state.currentUser = null;
+        state.error = action.payload;
         if (state?.isError) {
             toast.error("something went wrong");
         }
@@ -135,6 +149,7 @@ export const authSlice = createSlice({
         state.isError = false ;
         state.isSuccess = true;
         state.currentUser = action?.payload;
+        state.error  = '';
         if (state?.isSuccess) {
             // toast.success("user created successfully, please Login");
         }
@@ -145,8 +160,10 @@ export const authSlice = createSlice({
         state.isError = true;
         state.isSuccess = false;
         state.currentUser = null;
+        state.error = action.payload;
         if (state?.isError) {
             toast.error("something went wrong");
+
         }
         // state.message = action.error;
     })

@@ -1,6 +1,6 @@
 import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Calendar, Calendar1Icon, CalendarDaysIcon, CalendarPlus, Clock, Flag, MapPin, MapPinOff, Target } from "lucide-react-native";
+import { ArrowRight, Calendar, Calendar1Icon, CalendarDaysIcon, CalendarPlus, Clock, Flag, MapPin, MapPinOff, Target } from "lucide-react-native";
 import { format, parseISO } from "date-fns";
 import axios from 'axios';
 import API from '@/redux/features/MainApi';
@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 const Rides = () => {
   const [state, setState] = useState<any>("pending");
   const [requests, setRequests] = useState([]);
+
+  const lastDate = requests?.length ? format(requests?.[requests?.length - 1]?.['created_at'], "MM/yyyy") : '02/2025'
 
   // current user
   const {currentUser: user} = useSelector((state: any) => state?.auth);
@@ -123,8 +125,8 @@ const Rides = () => {
         {/* <search /> */}
 
       </View>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {format(requests[requests.length - 1]['created_at'], "MM/yyyy")}</Text>
-      <View className='px-3'>
+      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
+      <ScrollView className='px-3'>
         
         {requests.length > 0 && (
           <FlatList
@@ -141,7 +143,12 @@ const Rides = () => {
                   <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><CalendarDaysIcon size={22} color="gray" /></View>
                   <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text><Clock size={22} color="gray" className='font-bold' /></View>
                 </View>
-                <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
+                <View className='flex flex-row-reverse items-center justify-between w-full '>
+                  <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
+                  <View><ArrowRight  /><Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text></View>
+                </View>
+
+                
 
               </View>
             )
@@ -152,7 +159,7 @@ const Rides = () => {
         )}
 
 
-      </View>
+      </ScrollView>
 
     </View>
     </ScrollView>

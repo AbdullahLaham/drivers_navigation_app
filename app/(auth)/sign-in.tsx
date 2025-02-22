@@ -10,11 +10,16 @@ import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { useRouter } from "expo-router";
+import { Loader, LoaderCircle } from "lucide-react-native";
 const SignIn = () => {
+
+  const [loading, setLoading] = useState(false);
+
 
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const {currentUser} = useSelector((state: any) => state?.auth);
+  const {currentUser: user, error, isError} = useSelector((state: any) => state?.auth);
+  
 
 
   // const { signIn, setActive, isLoaded } = useSignIn();
@@ -26,6 +31,7 @@ const SignIn = () => {
 
   const onSignInPress = useCallback(async () => {
     // if (!isLoaded) return;
+    setLoading(true);
 
     try {
 
@@ -36,8 +42,13 @@ const SignIn = () => {
       console.log('logres', );
       const client = await res;
 
-      if (client?.payload?.client?.email) {
+      console.log('res', client?.payload?.data?.email);
+
+      if (client?.payload?.data) {
         router.push(`/(root)/(tabs)/home`);
+        setLoading(false);
+      } else {
+        setLoading(false);
       }
 
 
@@ -57,7 +68,10 @@ const SignIn = () => {
       // }
     } catch (err: any) {
       console.log(JSON.stringify(err, null, 2));
+      setLoading(false);
       Alert.alert("Error", err.errors[0].longMessage);
+    }finally {
+      setLoading(false);
     }
   }, [ form]);
 
@@ -73,6 +87,8 @@ const SignIn = () => {
             Welcome 👋
           </Text>
         </View>
+
+        {isError && <Text className="mx-5 text-red-500 font-JakartaBold text-md bg-gray-100 rounded-lg p-2">{error}</Text>}
 
         <View className="p-5">
           <InputField
@@ -94,11 +110,16 @@ const SignIn = () => {
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
 
-          <CustomButton
+          {loading ?  (
+            <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5">
+              <Loader size={30} color="blue" className="animate-spin" /> 
+            </View>
+          ) :<CustomButton
+          
             title="Sign In"
             onPress={onSignInPress}
             className="mt-6"
-          />
+          />}
 
           {/* <OAuth /> */}
 
@@ -106,8 +127,8 @@ const SignIn = () => {
             href="/sign-up"
             className="text-lg text-center text-general-200 mt-10"
           >
-            Don't have an account?{" "}
-            <Text className="text-primary-500">Sign Up</Text>
+            هل أنت زبون جديد?{" "}
+            <Text className="text-primary-500">أنشىء حسابا</Text>
           </Link>
         </View>
       </View>
