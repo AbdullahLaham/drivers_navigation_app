@@ -18,6 +18,7 @@ const Profile = () => {
       </Text>
       
       
+      
 
     </View>
   )

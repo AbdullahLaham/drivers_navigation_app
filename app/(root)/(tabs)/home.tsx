@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
 import API from "@/redux/features/MainApi";
 import { useSelector } from "react-redux";
-import { Loader, Pin, PinIcon, Target } from "lucide-react-native";
+// import {  Target } from "lucide-react-native";
 
 export default function Page() {
   // current user
@@ -143,25 +143,29 @@ export default function Page() {
 
 
 
-  const searchPlaces = async (text: string) => {
+  // const searchPlaces = async (text: string) => {
 
-    // setQuery(text);
-    if (text.length > 3) {
-      console.log('Fetching data...');
-      // const response = await fetch(
-      //   `https://nominatim.openstreetmap.org/search?format=json&q=${text}`
-      // );
 
-      const res = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${text}`);
 
-      console.log(res, 'ser');
-      console.log('ok', res.status);
-      console.log('Data received:', res.data);
-      setSuggestions(res?.data);
-    } else {
-      setSuggestions([]);
-    }
-  };
+
+
+  //   // setQuery(text);
+  //   if (text.length > 3) {
+  //     console.log('Fetching data...');
+  //     // const response = await fetch(
+  //     //   `https://nominatim.openstreetmap.org/search?format=json&q=${text}`
+  //     // );
+
+  //     const res = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${text}`);
+
+  //     console.log(res, 'ser');
+  //     console.log('ok', res.status);
+  //     console.log('Data received:', res.data);
+  //     setSuggestions(res?.data);
+  //   } else {
+  //     setSuggestions([]);
+  //   }
+  // };
 
   // create new Ride
   const onCreateRide = async () => {
@@ -238,11 +242,14 @@ console.log('CurrentLocation', currentLocation);
 
   useEffect(() => {
     const requestLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+      
       if (status !== "granted") {
         Alert.alert("Permission Denied", "Please enable location services.");
         return;
       }
+
       setLocationPermission(true);
 
       // بعد السماح بالموقع، جلب الموقع الحالي
@@ -263,6 +270,10 @@ console.log('CurrentLocation', currentLocation);
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       }, 1000);
+      } catch(error) {
+        console.error("Error fetching location:", error);
+        Alert.alert("Error", "Failed to get location.");
+      }
     };
 
     requestLocation();
@@ -293,8 +304,9 @@ console.log('CurrentLocation', currentLocation);
         className="  h-[3rem] py-3 mt-[3rem]   px-3 my-1 border-none outline-none bg-gray-200 placeholder:text-gray-600 rounded-lg mx-2"
         placeholder="ابحث عن موقع..."
         value={query}
-        onChangeText={(text) => { setQuery(text); console.log(query, 'qq'); searchPlaces(query) }}
+        onChangeText={(text) => { setQuery(text); console.log(query, 'qq') }}
       />
+      
         {/* {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
@@ -326,8 +338,10 @@ console.log('CurrentLocation', currentLocation);
       </View>
 
       <MapView
-      ref={mapRef}
+        ref={mapRef}
+        provider={PROVIDER_DEFAULT}
         style={styles.map}
+        // urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         initialRegion={{
           latitude: startLocation?.latitude,
           longitude: startLocation?.longitude,
@@ -335,12 +349,19 @@ console.log('CurrentLocation', currentLocation);
           longitudeDelta: 0.01,
         }}
       >
+
         {/* نقطة البداية */}
         {/* {startLocation && <Marker coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />} */}
         
         {startLocation?.latitude && startLocation?.longitude && (
           <Marker key={`${startLocation.latitude}-${startLocation.longitude}`} coordinate={startLocation} title="موقعي الحالي" pinColor="blue" />
         )}
+
+{/*         
+        <UrlTile
+          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+        /> */}
 
         {/* نقطة الوجهة (endLocation) */}
         {endLocation && <Marker key={`${startLocation.latitude}-${startLocation.longitude}`} coordinate={endLocation} title="الموقع المحدد" pinColor="red" />}
@@ -353,6 +374,7 @@ console.log('CurrentLocation', currentLocation);
             strokeWidth={3}
           />
         )}
+
       </MapView>
       {/* 📌  بيانات الرحلة */}
       <View className="w-full mt-auto mb-[5rem] flex flex-col ">
@@ -360,7 +382,7 @@ console.log('CurrentLocation', currentLocation);
       <View className="flex flex-row ">
         <TouchableOpacity  onPress={() => { setInpuStartLocation(JSON.stringify(startLocation));  console.log('')}}>
           <View className="bg-gray-300 mx-2 h-[3rem] w-[3rem] rounded-lg mt-1 flex items-center justify-center" >
-            <Target color="gray" size={25} className="text-red-500 bg-red-800" />
+            {/* <Target color="gray" size={25} className="text-red-500 bg-red-800" /> */}
           </View>
         </TouchableOpacity>
       <TextInput className="flex-1 rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />

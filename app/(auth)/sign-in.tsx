@@ -1,7 +1,6 @@
-import { useSignIn } from "@clerk/clerk-expo";
 import { Link, router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 // import OAuth from "@/components/OAuth";
@@ -10,13 +9,14 @@ import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { useRouter } from "expo-router";
-import { Loader, LoaderCircle } from "lucide-react-native";
+// import { Loader, LoaderCircle } from "lucide-react-native";
 const SignIn = () => {
 
   const [loading, setLoading] = useState(false);
 
 
   const dispatch = useAppDispatch();
+  
   const router = useRouter();
   const {currentUser: user, error, isError} = useSelector((state: any) => state?.auth);
   
@@ -31,7 +31,7 @@ const SignIn = () => {
 
   const onSignInPress = useCallback(async () => {
     // if (!isLoaded) return;
-    setLoading(true);
+    // setLoading(true);
 
     try {
 
@@ -39,23 +39,14 @@ const SignIn = () => {
         email: form?.email,
         password: form?.password,
       }));
+
       const client = await res;
 
-      // console.log('res', client?.payload?.data?.email);
 
       if (client?.payload?.data) {
         router.push(`/(root)/(tabs)/home`);
-        setLoading(false);
       } else {
-        setLoading(false);
       }
-
-
-      // const signInAttempt = await signIn.create({
-      //   identifier: form.email,
-      //   password: form.password,
-      // });
-      // dispatch(login());
 
       // if (signInAttempt.status === "complete") {
       //   await setActive({ session: signInAttempt.createdSessionId });
@@ -67,18 +58,16 @@ const SignIn = () => {
       // }
     } catch (err: any) {
       console.log(JSON.stringify(err, null, 2));
-      setLoading(false);
-      Alert.alert("Error", err.errors[0].longMessage);
+      Alert.alert("Error");
     }finally {
-      setLoading(false);
     }
   }, [ form]);
 
-  useEffect(() => {
-    if (user?.data?.token) {
-      router.push(`/(root)/(tabs)/home`);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (user?.data?.token) {
+  //     router.push(`/(root)/(tabs)/home`);
+  //   }
+  // }, []);
  
 
 
@@ -88,7 +77,7 @@ const SignIn = () => {
         <View className="relative w-full h-[250px]">
           <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
           <Text className="text-2xl text-black font-JakartaSemiBold absolute bottom-5 left-5">
-            Welcome 👋
+            أهلا وسهلا 👋
           </Text>
         </View>
 
@@ -114,7 +103,7 @@ const SignIn = () => {
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
 
-          {loading ?  (
+          {/* {loading ?  (
             <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5">
               <Loader size={30} color="blue" className="animate-spin" /> 
             </View>
@@ -123,17 +112,26 @@ const SignIn = () => {
             title="Sign In"
             onPress={onSignInPress}
             className="mt-6"
-          />}
+          />} */}
+
+        <CustomButton
+                  
+          title="تسجيل الدخول"
+          onPress={onSignInPress}
+          className="mt-6"
+        />
 
           {/* <OAuth /> */}
 
-          <Link
-            href="/sign-up"
-            className="text-lg text-center text-general-200 mt-10"
+          <TouchableOpacity onPress={() => router.replace("/(auth)/sign-up")}
+
+            // href="/sign-up"
+            className="text-lg text-center text-general-200 mt-10 flex flex-row-reverse items-center gap-2 "
           >
-            هل أنت زبون جديد?{" "}
-            <Text className="text-primary-500">أنشىء حسابا</Text>
-          </Link>
+            <Text className="font-semibold">هل أنت زبون جديد?</Text>
+            <Text className="text-primary-500 font-JakartaExtraBold">أنشىء حسابا</Text>
+          </TouchableOpacity>
+          
         </View>
       </View>
     </ScrollView>

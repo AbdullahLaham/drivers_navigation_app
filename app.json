@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "malltoall_navigation_app",
+    "name": "ajwan_app",
     "slug": "malltoall_navigation_app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,10 +12,16 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.ajwan.expoapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "We need your location to display the map."
       }
     },
+    
     "android": {
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

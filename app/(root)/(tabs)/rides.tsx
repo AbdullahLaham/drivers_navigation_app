@@ -1,10 +1,11 @@
-import { FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, Calendar, Calendar1Icon, CalendarDaysIcon, CalendarPlus, Clock, Flag, MapPin, MapPinOff, Target } from "lucide-react-native";
+// import { ArrowRight, CalendarDaysIcon, Clock, MapPin,  Target } from "lucide-react-native";
 import { format, parseISO } from "date-fns";
 import axios from 'axios';
 import API from '@/redux/features/MainApi';
 import { useSelector } from 'react-redux';
+import { icons } from '@/constants';
 
 const Rides = () => {
   const [state, setState] = useState<any>("pending");
@@ -22,6 +23,7 @@ const Rides = () => {
     Authorization: `Bearer ${user?.data?.token}`
    } 
   });
+  
   setRequests(res?.data?.orders);
   
     // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
@@ -32,6 +34,7 @@ const Rides = () => {
 
   useEffect(() => {
     getOrders();
+    
   }, []);
 
   const convertToDate = (isoString: any) => {
@@ -132,18 +135,34 @@ const Rides = () => {
             keyExtractor={(item: any) => item?.id}
             renderItem={({ item }) => (
               <View className='w-[100%] flex flex-col items-end justify-start mb-3 border-b r border-gray-400 p-1 rounded-sm'>
-                <View className='flex items-center flex-row-reverse gap-2'><MapPin color="green" size={20} /><Text className='text-gray-400 my-1  text-md'>{item?.from}</Text></View>
-                <View className='flex items-center flex-row-reverse gap-2'><Target color="red" size={20} /><Text className='text-gray-400 my-1  text-md'>{item?.to}</Text></View>
+                <View className='flex items-center flex-row-reverse gap-2'>
+                  {/* <MapPin color="green" size={20} /> */}
+                  <Image source={icons.map} className={`w-6 h-6 ml-4`}/>
+                  <Text className='text-gray-400 my-1  text-md'>{item?.from}</Text>
+                </View>
+                <View className='flex items-center flex-row-reverse gap-2'>
+                  {/* <Target color="red" size={20} /> */}
+                  <Image source={icons.selectedMarker} className={`w-6 h-6 ml-4`}/>
+                  <Text className='text-gray-400 my-1  text-md'>{item?.to}</Text>
+                </View>
                 
                 
                 
                 <View className='flex flex-row-reverse items-center justify-between w-full '>
-                  <View className='flex flex-row items-center '><Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text><CalendarDaysIcon size={22} color="gray" /></View>
-                  <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text><Clock size={22} color="gray" className='font-bold' /></View>
+                  <View className='flex flex-row items-center '>
+                    <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text>
+                    {/* <CalendarDaysIcon size={22} color="gray" /> */}
+                  </View>
+                  <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text>
+                  {/* <Clock size={22} color="gray" className='font-bold' /> */}
+                  </View>
                 </View>
                 <View className='flex flex-row-reverse items-center justify-between w-full '>
                   <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
-                  <View><ArrowRight  /><Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text></View>
+                  <View>
+                    {/* <ArrowRight  /> */}
+                    <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
+                  </View>
                 </View>
 
                 

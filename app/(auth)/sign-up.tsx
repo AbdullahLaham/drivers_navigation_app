@@ -1,6 +1,6 @@
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
 import CustomButton from "@/components/CustomButton";
@@ -11,12 +11,11 @@ import { fetchAPI } from "@/lib/fetch";
 import { useDispatch, useSelector } from "react-redux";
 import { login, register } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
-import { Loader } from "lucide-react-native";
+// import { Loader } from "lucide-react-native";
 
 const SignUp = () => {
   // const { isLoaded, signUp, setActive } = useSignUp();
 
-  const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -41,9 +40,6 @@ const SignUp = () => {
       
     // });
     // console.log('hiiiiiiiiiii')
-    setLoading(true);
-
-
     try {
 
       const res = dispatch(register(
@@ -54,31 +50,19 @@ const SignUp = () => {
         }
       ));
 
-
       const client = await res;
 
       // console.log(client?.payload, 'pppp');
 
       if (client?.payload?.data) {
-        // alert('client created successfully');
-        setErrorMessage("");
-        // console.log(client?.payload);
-        setLoading(false);
         router.push(`/(root)/(tabs)/home`);
-      } else {
-        setLoading(false);
       }
-
-      
 
     } catch (err: any) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.log(err, 'errrrrrrrrr')
-      setLoading(false);
-      Alert.alert("Error", err.errors[0].longMessage);
-    }finally {
-      setLoading(false);
+      Alert.alert("Error");
     }
   };
 
@@ -89,35 +73,7 @@ const SignUp = () => {
   //   }
   // }, []);
 
-  
-  const onPressVerify = async () => {
-    // if (!isLoaded) return;
-    try {
-      // const completeSignUp = await signUp.attemptEmailAddressVerification({
-      //   code: verification.code,
-      // });
-      // if (completeSignUp.status === "complete") {
-        // await fetchAPI("/(api)/user", {
-        //   method: "POST",
-        //   body: JSON.stringify({
-        //     name: form.name,
-        //     email: form.email,
-        //     clerkId: completeSignUp.createdUserId,
-        //   }),
-        // });
-      //   await setActive({ session: completeSignUp.createdSessionId });
-      //   setVerification({
-      //     ...verification,
-      //     state: "success",
-      //   });
-      // } else {
-      // }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
 
-    }
-  };
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
@@ -154,7 +110,8 @@ const SignUp = () => {
             value={form.password}
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
-          {loading ?  (
+
+          {/* {loading ?  (
             <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5">
               <Loader size={30} color="blue" className=" animate-spin" /> 
             </View>
@@ -162,16 +119,22 @@ const SignUp = () => {
           title="انشاء حساب "
           onPress={onSignUpPress}
           className="mt-6"
-        />}
+        />} */}
+
+        <CustomButton
+          title="انشاء حساب "
+          onPress={onSignUpPress}
+          className="mt-6"
+        />
+        
           
           {/* <OAuth /> */}
-          <Link
-            href="/sign-in"
-            className="text-lg text-center text-general-200 mt-10"
+          <TouchableOpacity onPress={() => router.replace("/(auth)/sign-in")}
+            className="text-lg text-center text-general-200 mt-10 flex flex-row-reverse items-center gap-2"
           >
-            هل أنت زبون عند أجوان ?{" "}
-            <Text className="text-primary-500">سجل الدخول</Text>
-          </Link>
+            <Text className="font-semibold ">هل أنت زبون عند أجوان ?</Text>
+            <Text className="text-primary-500 font-JakartaExtraBold">سجل الدخول</Text>
+          </TouchableOpacity>
         </View>
         {/* <ReactNativeModal
           isVisible={verification.state === "pending"}

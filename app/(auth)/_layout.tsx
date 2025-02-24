@@ -4,7 +4,6 @@ import 'react-native-reanimated';
 import {Text} from 'react-native'
 
 // import "../global.css";
-// import { useAuth } from '@clerk/clerk-expo';
 
 
 export default function AuthLayout() {
@@ -23,6 +22,5 @@ export default function AuthLayout() {
         <Stack.Screen name="sign-up" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      // <StatusBar style="auto" />
   );
 }
