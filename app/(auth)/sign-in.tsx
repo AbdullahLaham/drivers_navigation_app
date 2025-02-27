@@ -63,11 +63,11 @@ const SignIn = () => {
     }
   }, [ form]);
 
-  // useEffect(() => {
-  //   if (user?.data?.token) {
-  //     router.push(`/(root)/(tabs)/home`);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (user?.data?.token) {
+      router.push(`/(root)/(tabs)/home`);
+    }
+  }, []);
  
 
 

@@ -57,7 +57,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-swiper": "^1.6.0",
     "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5",
+    "react-native-webview": "^13.13.2",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
     "sonner": "^1.7.4",

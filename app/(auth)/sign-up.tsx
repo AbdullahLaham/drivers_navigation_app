@@ -73,6 +73,12 @@ const SignUp = () => {
   //   }
   // }, []);
 
+  useEffect(() => {
+    if (user?.data?.token) {
+      router.push(`/(root)/(tabs)/home`);
+    }
+  }, []);
+
 
   return (
     <ScrollView className="flex-1 bg-white">

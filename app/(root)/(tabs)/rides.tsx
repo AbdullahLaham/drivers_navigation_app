@@ -5,7 +5,9 @@ import { format, parseISO } from "date-fns";
 import axios from 'axios';
 import API from '@/redux/features/MainApi';
 import { useSelector } from 'react-redux';
-import { icons } from '@/constants';
+import { icons, images } from '@/constants';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
 
 const Rides = () => {
   const [state, setState] = useState<any>("pending");
@@ -14,28 +16,31 @@ const Rides = () => {
   const lastDate = requests?.length ? format(requests?.[requests?.length - 1]?.['created_at'], "MM/yyyy") : '02/2025'
 
   // current user
-  const {currentUser: user} = useSelector((state: any) => state?.auth);
+  const {currentUser: user, isNewRide} = useSelector((state: any) => state?.auth);
 
   const getOrders = async () => {
-    const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/orders',
-  {
-   headers: {
-    Authorization: `Bearer ${user?.data?.token}`
-   } 
-  });
+      console.log('requsting ............................')
+      const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/orders',
+    {
+     headers: {
+      Authorization: `Bearer ${user?.data?.token}`
+     } 
+    });
+    
+    setRequests(res?.data?.orders);
+    
+      // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
   
-  setRequests(res?.data?.orders);
-  
-    // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
-
-    console.log('res', res?.data?.orders)
-    // setRequests(res?.data);
-  }
+      console.log('res', res?.data?.orders);
+      // setRequests(res?.data);
+    }
 
   useEffect(() => {
+    
+    
     getOrders();
     
-  }, []);
+  }, [isNewRide]);
 
   const convertToDate = (isoString: any) => {
     return format(parseISO(isoString), "yyyy-MM-dd");
@@ -89,7 +94,7 @@ const Rides = () => {
   // ];
 
   return (
-      <View>
+      <SafeAreaView>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
         طلباتك
       </Text>
@@ -127,57 +132,74 @@ const Rides = () => {
         {/* <search /> */}
 
       </View>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  ' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
-        
-        {requests.length > 0 && (
-          <FlatList
-            data={requests}
-            keyExtractor={(item: any) => item?.id}
-            renderItem={({ item }) => (
-              <View className='w-[100%] flex flex-col items-end justify-start mb-3 border-b r border-gray-400 p-1 rounded-sm'>
-                <View className='flex items-center flex-row-reverse gap-2'>
-                  {/* <MapPin color="green" size={20} /> */}
-                  <Image source={icons.map} className={`w-6 h-6 ml-4`}/>
-                  <Text className='text-gray-400 my-1  text-md'>{item?.from}</Text>
-                </View>
-                <View className='flex items-center flex-row-reverse gap-2'>
-                  {/* <Target color="red" size={20} /> */}
-                  <Image source={icons.selectedMarker} className={`w-6 h-6 ml-4`}/>
-                  <Text className='text-gray-400 my-1  text-md'>{item?.to}</Text>
-                </View>
-                
-                
-                
-                <View className='flex flex-row-reverse items-center justify-between w-full '>
-                  <View className='flex flex-row items-center '>
-                    <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)} </Text>
-                    {/* <CalendarDaysIcon size={22} color="gray" /> */}
-                  </View>
-                  <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text>
-                  {/* <Clock size={22} color="gray" className='font-bold' /> */}
-                  </View>
-                </View>
-                <View className='flex flex-row-reverse items-center justify-between w-full '>
-                  <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
-                  <View>
-                    {/* <ArrowRight  /> */}
-                    <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
-                  </View>
-                </View>
-
-                
-
-              </View>
-            )
+      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
+       
+      <FlatList
+        data={requests}
+        keyExtractor={(item: any) => item?.id}
+        renderItem={({ item }) => (
+          <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1  border-b r border-gray-400 p-1 rounded-sm'>
+            <View className='flex items-center flex-row-reverse '>
+              {/* <MapPin color="green" size={20} /> */}
+              <Image source={icons.point} className={`w-6 h-6 ml-4`}/>
+              <Text className='text-gray-400 my-1  text-md'>{item?.from}</Text>
+            </View>
+            <View className='flex items-center flex-row-reverse '>
+              {/* <Target color="red" size={20} /> */}
+              <Image source={icons.to} className={`w-6 h-6 ml-4`}/>
+              <Text className='text-gray-400 my-1  text-md'>{item?.to}</Text>
+            </View>
             
-          }
-          nestedScrollEnabled={true}
-          />
-        )}
+            
+            
+            <View className='flex flex-row-reverse items-center justify-between w-full '>
+              <View className='flex flex-row items-center '>
+                <Text className='text-gray-500 text-sm font-semibold -ml-2'>{convertToDate(item?.created_at)} </Text>
+                {/* <CalendarDaysIcon size={22} color="gray" /> */}
+                <Image source={icons.clock} className={`w-6 h-6 ml-3`}/>
+              </View>
+              <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text>
+              {/* <Clock size={22} color="gray" className='font-bold' /> */}
+              <Image source={icons.date} className={`w-6 h-6 ml-1`}/>
+              </View>
+            </View>
+            <View className='flex flex-row-reverse items-center justify-between w-full '>
+              <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
+              <View>
+                {/* <ArrowRight  /> */}
+                <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
+              </View>
+            </View>
+
+            
+
+          </View>
+        )
+        
+      }
+
+      nestedScrollEnabled={true}
+      ListEmptyComponent={() => (
+        <View className="flex flex-col items-center justify-center">
+            
+            <>
+              <Image
+                source={images.noResult}
+                className="w-40 h-40"
+                alt="No recent rides found"
+                resizeMode="contain"
+              />
+              <Text className="text-sm">No recent rides found</Text>
+            </>
+          
+        </View>
+      )}
+      ListFooterComponent={<View style={{ height: 200 }} />} // يضيف هامشًا بعد العنصر الأخير
+      />
 
 
 
-    </View>
+    </SafeAreaView>
   )
 }
 

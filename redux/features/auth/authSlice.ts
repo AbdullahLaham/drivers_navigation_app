@@ -6,6 +6,7 @@ import API from '../MainApi';
 
 type stateType = {
     currentUser: any,
+    isNewRide: Boolean,
     listingAddedToWishlist: any,
     listingDeletedFromWishlist: any,
     wishlist: any,
@@ -28,6 +29,7 @@ const user = getData('user');
 
 const initialState: stateType = {
   currentUser:  user,
+  isNewRide: false,
   listingAddedToWishlist: {},
   listingDeletedFromWishlist: {},
   wishlist: [],
@@ -70,10 +72,24 @@ export const register = createAsyncThunk('auth/register', async (user: any, thun
 
 })
 
+
+export const createRide = createAsyncThunk('auth/new-ride', async (thunkAPI) => {
+    try {
+  
+        // return await authService.logout();
+        console.log('hello');
+        
+    } catch (error) {
+      throw new Error("something went wrong");
+    }
+  
+  })
+
+
 export const logout = createAsyncThunk('auth/logout', async (thunkAPI) => {
   try {
 
-      return await authService.logout();
+    //   return await authService.logout();
       
   } catch (error) {
     throw new Error("something went wrong");
@@ -160,6 +176,35 @@ export const authSlice = createSlice({
         state.isError = true;
         state.isSuccess = false;
         state.currentUser = null;
+        state.error = action.payload;
+        if (state?.isError) {
+            toast.error("something went wrong");
+
+        }
+        // state.message = action.error;
+    })
+
+
+
+    .addCase(createRide.pending,(state) => {state.isLoading = true }  )
+    
+    
+    .addCase(createRide.fulfilled,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = false ;
+        state.isSuccess = true;
+        state.isNewRide = true;
+        state.error  = '';
+        if (state?.isSuccess) {
+            // toast.success("user created successfully, please Login");
+        }
+    })
+
+    .addCase(createRide.rejected,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = true;
+        state.isSuccess = false;
+        state.isNewRide = false;
         state.error = action.payload;
         if (state?.isError) {
             toast.error("something went wrong");

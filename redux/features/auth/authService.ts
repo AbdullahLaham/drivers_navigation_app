@@ -45,6 +45,15 @@ const signUp = async (user: any) => {
         throw new Error(error);            
     }
 }
+// const createRide = async (data: any) => {
+//     try {
+//          const res = await API.put(`/user/addtoFavorites/${listingId}`);
+//          return res?.data;
+//     } catch(error) {
+//         throw new Error("something went wrong");
+//     }
+// }
+
 const getWishlist = async () => {
     try {
         const res = await API.get('/user/wishlist');
@@ -56,6 +65,7 @@ const getWishlist = async () => {
         throw new Error("something went wrong");
     }
 }
+
 const addListingToWishlist = async (listingId: string) => {
     try {
          const res = await API.put(`/user/addtoFavorites/${listingId}`);
@@ -64,6 +74,7 @@ const addListingToWishlist = async (listingId: string) => {
         throw new Error("something went wrong");
     }
 }
+
 const removeListingFromWishlist = async (listingId: string) => {
     try {
         const res = await API.delete(`/user/removefromFavorites/${listingId}`);
@@ -72,6 +83,7 @@ const removeListingFromWishlist = async (listingId: string) => {
         throw new Error("something went wrong");
     }
 }
+
 const logout = async () => {
     // localStorage.clear();
 }

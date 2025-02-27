@@ -4,8 +4,10 @@ import React from 'react'
 const Chat = () => {
   return (
     <View>
-      <Text>Chat</Text>
-    </View>
+          <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
+            المحادثة
+          </Text>   
+        </View>
   )
 }
 

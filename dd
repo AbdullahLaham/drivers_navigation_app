@@ -1,8 +1,0 @@
-java -jar C:\Users\hp15-AY\Desktop\bundletool\bundletool-all-1.18.0.jar build-apks --bundle="C:\Users\hp15-AY\Desktop\bundle\application-cd662b7d-5a43-41b4-bac9-f93fddfcf565.aab" --output="C:\Users\hp15-AY\Desktop\output.apks" --mode=universal --ks="C:\Users\hp15-AY\my-release-key.jks" --ks-pass=pass:Abed26194== --ks-key-alias=my-key-alias --key-pass=pass:Abed26194==
-
-
-java -jar C:\Users\hp15-AY\Desktop\bundletool\bundletool-all-1.18.0.jar build-apks --bundle="C:\Users\hp15-AY\Desktop\bundle\application-20cfce28-52e7-41d1-b4a6-8d379da5721f.aab" --output="C:\Users\hp15-AY\Desktop\ajwan.apks" --mode=universal --ks="C:\Users\hp15-AY\Desktop\bundle\Usershp15-AYmy-release-key.jks" --ks-pass=pass:Abed26194== --ks-key-alias=my-key-alias --key-pass=pass:Abed26194==
-
-
-
-java -jar C:\Users\hp15-AY\Desktop\bundletool\bundletool-all-1.18.0.jar build-apks --bundle="C:\Users\hp15-AY\Desktop\bundle\application-20cfce28-52e7-41d1-b4a6-8d379da5721f.aab" --output="C:\Users\hp15-AY\Desktop\ajwan.apks" --mode=universal --ks="C:\Users\hp15-AY\Desktop\bundle\Usershp15-AYmy-release-key.jks" --ks-pass=pass:Abed26194== --ks-key-alias=my-key-alias --key-pass=pass:Abed26194==
