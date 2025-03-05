@@ -132,7 +132,7 @@ const Rides = () => {
         {/* <search /> */}
 
       </View>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex-1  mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
+      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex flex-row-reverse   mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
        
       <FlatList
         data={requests}

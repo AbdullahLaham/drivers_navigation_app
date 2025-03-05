@@ -1,0 +1,120 @@
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { icons, images } from '@/constants';
+import { router } from 'expo-router'
+import axios from 'axios'
+import { useSelector } from 'react-redux'
+import { format, parseISO } from 'date-fns'
+
+const Notification = () => {
+  const [notifications, setNotifications] = useState([]);
+  // current user
+  const {currentUser: user, isNewRide} = useSelector((state: any) => state?.auth);
+const convertToDate = (isoString: any) => {
+    return format(parseISO(isoString), "yyyy-MM-dd");
+  };
+  const getNotifications = async () => {
+    console.log('requsting ............................')
+    const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/notifications',
+  {
+   headers: {
+    Authorization: `Bearer ${user?.data?.token}`
+   } 
+  });
+  
+  setNotifications(res?.data?.orders);
+  
+    // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
+    console.log('res', res?.data?.notifications?.data);
+    setNotifications(res?.data?.notifications?.data);
+    // setRequests(res?.data);
+  }
+
+useEffect(() => {
+  
+  getNotifications();
+  
+}, []);
+  return (
+    <View>
+      <View className='flex items-center justify-center p-3 bg-[#6d6969] relative'>
+        <Text className=' text-white text-center font-bold text-lg block'>
+            الاشعارات   
+           
+        </Text>
+        <TouchableOpacity className='ml-auot absolute right-4 top-2  rounded-full px-2 py-1' onPress={() => router.push('/(root)/(tabs)/home')}>
+        <Image source={icons.arrowRight} className='w-8 h-8 rounded-full p-2' />
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+          data={notifications}
+          keyExtractor={(item: any) => item?.id}
+          renderItem={({ item }) => (
+            <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1  border-b r border-gray-400 p-1 rounded-sm'>
+              <View className='flex items-center flex-row-reverse '>
+                {/* <MapPin color="green" size={20} /> */}
+                <Image source={icons.bell} className={`w-6 h-6 ml-4`}/>
+                <Text className='text-gray-400 my-1  text-md'>{item?.from}</Text>
+              </View>
+              <View className='flex flex-row-reverse items-center justify-between w-full '>
+                <View className='flex flex-row items-center '>
+                  <Text className='text-gray-500 text-sm font-semibold -ml-2'>{convertToDate(item?.created_at)} </Text>
+                  {/* <CalendarDaysIcon size={22} color="gray" /> */}
+                  <Image source={icons.clock} className={`w-6 h-6 ml-3`}/>
+                </View>
+                <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text>
+                {/* <Clock size={22} color="gray" className='font-bold' /> */}
+                <Image source={icons.date} className={`w-6 h-6 ml-1`}/>
+                </View>
+              </View>
+              <View className='flex flex-row-reverse items-center justify-between w-full '>
+                <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
+                <View>
+                  {/* <ArrowRight  /> */}
+                  <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
+                </View>
+              </View>
+  
+              
+  
+            </View>
+          )
+          
+        }
+  
+        nestedScrollEnabled={true}
+        ListEmptyComponent={() => (
+          <View className="flex flex-col items-center justify-center">
+              
+              <>
+                <Image
+                  source={images.noResult}
+                  className="w-40 h-40"
+                  alt="No recent rides found"
+                  resizeMode="contain"
+                />
+                <Text className="text-sm">No recent rides found</Text>
+              </>
+            
+          </View>
+        )}
+        ListFooterComponent={<View style={{ height: 200 }} />} // يضيف هامشًا بعد العنصر الأخير
+            />
+          
+
+
+          
+        </View>
+  )
+}
+
+export default Notification
+
+const styles = StyleSheet.create({});
+
+
+
+
+
+

@@ -54,7 +54,8 @@ const Profile = () => {
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
         التسعيرات
       </Text>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full mb-5' >   تسعيرات غزة </Text>
+      <Text className='font-bold text-xl text-gray-600 my-2 w-full flex flex-row-reverse ' style={{ textAlign: "right", writingDirection: "rtl" }}>   تسعيرات غزة </Text>      
+
       <View className='mx-1 my-1 bg-white  p-5 rounded-lg '>
       <FlatList
         data={prices}

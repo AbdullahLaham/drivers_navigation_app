@@ -5,12 +5,20 @@ const Chat = () => {
   return (
     <View>
           <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
-            المحادثة
+            الاشعارات
           </Text>   
+
+          
         </View>
   )
 }
 
 export default Chat
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
+
+
+
+
+
+

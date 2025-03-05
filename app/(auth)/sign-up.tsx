@@ -26,6 +26,7 @@ const SignUp = () => {
     name: "",
     email: "",
     password: "",
+    phone_number: '',
   });
 
   const onSignUpPress = async () => {
@@ -46,7 +47,8 @@ const SignUp = () => {
         {
           name: form?.name,
           email: form?.email,
-          password: form?.password
+          password: form?.password,
+          phone_number: form?.phone_number
         }
       ));
 
@@ -106,6 +108,14 @@ const SignUp = () => {
             textContentType="emailAddress"
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
+          />
+          <InputField
+            label="Phone"
+            placeholder="Phone Number"
+            // textContentType="Number"
+            icon={icons.phone}
+            value={form.phone_number}
+            onChangeText={(value) => setForm({ ...form, phone_number: value })}
           />
           <InputField
             label="Password"

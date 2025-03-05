@@ -17,13 +17,19 @@ import { View } from 'react-native';
 import "../global.css";
 import { store } from '@/redux/store';
 
-
+import usePusherNotifications from '@/hooks/usePusherNotifications'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+
+  usePusherNotifications(); // تفعيل الاستماع للأحداث
+
   const colorScheme = useColorScheme();
+  const queryClient = new QueryClient();
+
   const [loaded] = useFonts({
     "Jakarta-Bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
     "Jakarta-ExtraBold": require("../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
@@ -49,14 +55,18 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
-      
-        <Stack>
+      <QueryClientProvider client={queryClient}>
+      <Stack>
         <Stack.Screen name="(index)" options={{ headerShown: false }} />
         <Stack.Screen name="(root)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
+      </QueryClientProvider>
     </Provider>
+    
+      
+        
                 
   );
 }

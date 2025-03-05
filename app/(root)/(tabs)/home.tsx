@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image, SafeAreaView } from "react-native";
 // import MapView, { Marker, Polyline, UrlTile } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -10,6 +10,8 @@ import WebView from "react-native-webview";
 import { useAppDispatch } from "@/redux/store";
 import { createRide } from "@/redux/features/auth/authSlice";
 import { icons } from "@/constants";
+import { router } from "expo-router";
+import usePusherNotifications from "@/hooks/usePusherNotifications";
 // import {  Target } from "lucide-react-native";
 
 export default function Page() {
@@ -28,10 +30,7 @@ export default function Page() {
   const [currentLocation, setCurrentLocation] = useState('');
   const [address, setAddress] = useState('');
 
-  const [startLocation, setStartLocation] = useState({
-    latitude: 31.5003,
-    longitude: 34.4662,
-  });
+  const [startLocation, setStartLocation] = useState<any>(null);
   const [endLocation, setEndLocation] = useState<any | null>(null);
 
   // console.log(startLocation, endLocation);
@@ -378,25 +377,36 @@ export default function Page() {
     </body>
     </html>
   `;
+
+  // رسم الخط بين نقطتي البداية والنهاية
+  // var latlngs = [[${startLat}, ${startLng}], [${endLat}, ${endLng}]];
+  // var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+  // map.fitBounds(polyline.getBounds());
   return mapHtml;
   }
   
 
-
+  usePusherNotifications();
+  
   return (
-    <View className="flex-1 relative ">
+    <SafeAreaView className="flex-1 relative ">
+      <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 right-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
+        <Image source={icons.bell} className="w-8 h-8" />
+        <View className="w-2 h-2 rounded-full bg-red-500 absolute left-1 bottom-1"></View>
+      </TouchableOpacity>
       {/* 🔍 مربع البحث */}
       
       
 
       <View className="absolute -top-10 left-0 right-0    z-10 ">
-      <TextInput
+        
+      {/* <TextInput
         // dir='rtl'
         className="  h-[3rem] py-3 mt-[3rem]   px-3 my-1 border-none outline-none bg-gray-200 placeholder:text-gray-600 rounded-lg mx-2"
         placeholder="ابحث عن موقع..."
         value={query}
         onChangeText={(text) => setQuery(text) }
-      />
+      /> */}
       
         {/* {suggestions.length > 0 && (
           <FlatList
@@ -457,7 +467,7 @@ export default function Page() {
           
         )} */}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
