@@ -8,7 +8,7 @@ import API from "@/redux/features/MainApi";
 import { useSelector } from "react-redux";
 import WebView from "react-native-webview";
 import { useAppDispatch } from "@/redux/store";
-import { createRide } from "@/redux/features/auth/authSlice";
+import { createRide, logout } from "@/redux/features/auth/authSlice";
 import { icons } from "@/constants";
 import { router } from "expo-router";
 import usePusherNotifications from "@/hooks/usePusherNotifications";
@@ -31,75 +31,14 @@ export default function Page() {
   const [address, setAddress] = useState('');
 
   const [startLocation, setStartLocation] = useState<any>(null);
+
+
   const [endLocation, setEndLocation] = useState<any | null>(null);
 
   // console.log(startLocation, endLocation);
   const [selectedSug, setSelectedSug] = useState<any | null>(null)
   const [query, setQuery] = useState("");
 
-  const [suggestions, setSuggestions] = useState([{
-    "place_id": 390129430,
-    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-    "osm_type": "way",
-    "osm_id": 1338243107,
-    "lat": "30.0541134",
-    "lon": "31.32286366816771",
-    "class": "amenity",
-    "type": "university",
-    "place_rank": 30,
-    "importance": 0.000079604028381735,
-    "addresstype": "amenity",
-    "name": "جامعة الأزهر (فرع البنات)",
-    "display_name": "جامعة الأزهر (فرع البنات), طريق النصر, منطقه السينما, ثان مدينة نصر, القاهرة, 11759, مصر",
-    "boundingbox": [
-      "30.0515288",
-      "30.0564047",
-      "31.3209371",
-      "31.3246005"
-    ]
-  },
-  // {
-  //   "place_id": 41861832,
-  //   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-  //   "osm_type": "node",
-  //   "osm_id": 432191180,
-  //   "lat": "31.5336282",
-  //   "lon": "35.0979762",
-  //   "class": "amenity",
-  //   "type": "university",
-  //   "place_rank": 30,
-  //   "importance": 0.3448456713926686,
-  //   "addresstype": "amenity",
-  //   "name": "جامعة بوليتكنيك فلسطين",
-  //   "display_name": "جامعة بوليتكنيك فلسطين, شارع عين خير الدين, الخليل, المدينة القديمة, مركز المدينة, الخليل, منطقة H1, الضفة الغربية, 150, Palestinian Territory",
-  //   "boundingbox": [
-  //     "31.5335782",
-  //     "31.5336782",
-  //     "35.0979262",
-  //     "35.0980262"
-  //   ]
-  // },
-  {
-    "place_id": 42016742,
-    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-    "osm_type": "way",
-    "osm_id": 41306746,
-    "lat": "31.4771994",
-    "lon": "34.405015151544774",
-    "class": "amenity",
-    "type": "university",
-    "place_rank": 30,
-    "importance": 0.32649689072535304,
-    "addresstype": "amenity",
-    "name": "جامعة فلسطين",
-    "display_name": "جامعة فلسطين, شارع عكا, الزهراء‎, الزهرة مدينة, محافظة غزة, قطاع غزة, Palestinian Territory",
-    "boundingbox": [
-      "31.4758106",
-      "31.4783958",
-      "34.4032858",
-      "34.4067669"
-    ]
-  },]);
 
   const [locationPermission, setLocationPermission] = useState(false);
 
@@ -135,17 +74,6 @@ export default function Page() {
   //   mapRef.current?.animateToRegion(newRegion, 1000);
 
   // };
-  
-  const selectNewLocation = (region: any) => {
-
-    const newRegion = {
-      latitude: parseFloat(region?.lat),
-      longitude: parseFloat(region?.lon),
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    };
-    mapRef.current?.animateToRegion(newRegion, 1000);
-  }
 
 
 
@@ -204,15 +132,6 @@ export default function Page() {
 
 
   }
-
-  // useEffect(() => {
-  //   requestLocationPermission();
-  // }, []);
-
-
-
-
-
 
   // useEffect(() => {
   //   const fetchLocation = async () => {
@@ -316,30 +235,35 @@ export default function Page() {
     requestLocation();
   }, []);
 
+  useEffect(() => {
+    const checkAuth = async () => {
 
+      if (!user?.data?.token) {
+        router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
+        return;
+      }
 
+      try {
+        const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
+          headers: {
+            Authorization: `Bearer ${user?.data?.token}`
+           }
+        })
 
+        if (!res.data) {
+          dispatch(logout())
+          router.replace("/(auth)/sign-in");
 
+        }
 
+      } catch (error) {
+        dispatch(logout());
+        router.replace("/(auth)/sign-in");
+      }
+    };
 
-
-
-
-
-
-  // useEffect(() => {
-    // if (mapRef.current && startLocation) {
-    //   mapRef.current.animateToRegion({
-    //     latitude: startLocation.latitude,
-    //     longitude: startLocation.longitude,
-    //     latitudeDelta: 0.01,
-    //     longitudeDelta: 0.01,
-    //   }, 1000);
-    // }
-  // }, [startLocation]);
-
-
-
+    checkAuth();
+  }, [user]);
 
   const generateMap = () => {
     const mapHtml = `
@@ -438,7 +362,8 @@ export default function Page() {
         )} */}
       </View>
 
-      <WebView ref={mapRef} originWhitelist={["*"]} source={{ html: generateMap() }} />
+      <WebView originWhitelist={["*"]} source={{ html: generateMap() }} />
+      
 
       {/* 📌  بيانات الرحلة */}
       <View className=" mt-auto mb-[5rem] flex flex-col ">

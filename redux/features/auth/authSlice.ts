@@ -7,6 +7,7 @@ import API from '../MainApi';
 type stateType = {
     currentUser: any,
     isNewRide: Boolean,
+    isNewNotification: Boolean,
     listingAddedToWishlist: any,
     listingDeletedFromWishlist: any,
     wishlist: any,
@@ -30,6 +31,7 @@ const user = getData('user');
 const initialState: stateType = {
   currentUser:  user,
   isNewRide: false,
+  isNewNotification: false,
   listingAddedToWishlist: {},
   listingDeletedFromWishlist: {},
   wishlist: [],
@@ -73,7 +75,7 @@ export const register = createAsyncThunk('auth/register', async (user: any, thun
 })
 
 
-export const createRide = createAsyncThunk('auth/new-ride', async (thunkAPI) => {
+export const newNotification = createAsyncThunk('auth/new-notification', async (thunkAPI) => {
     try {
   
         // return await authService.logout();
@@ -85,6 +87,17 @@ export const createRide = createAsyncThunk('auth/new-ride', async (thunkAPI) => 
   
   })
 
+  export const createRide = createAsyncThunk('auth/new-ride', async (thunkAPI) => {
+    try {
+  
+        // return await authService.logout();
+        console.log('hello');
+        
+    } catch (error) {
+      throw new Error("something went wrong");
+    }
+  
+  })
 
 export const logout = createAsyncThunk('auth/logout', async (thunkAPI) => {
   try {
@@ -187,8 +200,6 @@ export const authSlice = createSlice({
 
 
     .addCase(createRide.pending,(state) => {state.isLoading = true }  )
-    
-    
     .addCase(createRide.fulfilled,(state, action: PayloadAction<any>) => {
         state.isLoading = false ;
         state.isError = false ;
@@ -199,7 +210,6 @@ export const authSlice = createSlice({
             // toast.success("user created successfully, please Login");
         }
     })
-
     .addCase(createRide.rejected,(state, action: PayloadAction<any>) => {
         state.isLoading = false ;
         state.isError = true;
@@ -208,9 +218,29 @@ export const authSlice = createSlice({
         state.error = action.payload;
         if (state?.isError) {
             toast.error("something went wrong");
-
         }
-        // state.message = action.error;
+    })
+
+    .addCase(newNotification.pending,(state) => {state.isLoading = true }  )
+    .addCase(newNotification.fulfilled,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = false ;
+        state.isSuccess = true;
+        state.isNewNotification = true;
+        state.error  = '';
+        if (state?.isSuccess) {
+            // toast.success("user created successfully, please Login");
+        }
+    })
+    .addCase(newNotification.rejected,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = true;
+        state.isSuccess = false;
+        state.isNewNotification = false;
+        state.error = action.payload;
+        if (state?.isError) {
+            toast.error("something went wrong");
+        }
     })
 
 

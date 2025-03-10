@@ -9,12 +9,15 @@ import * as Notifications from "expo-notifications";
 import Pusher from "pusher-js";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from "react-redux";
+import { useAppDispatch } from "@/redux/store";
+import { newNotification } from "@/redux/features/auth/authSlice";
 
 Pusher.logToConsole = true;
 
 
 const Layout = () => {
   console.log('hekko');
+  const dispatch = useAppDispatch();
   const {currentUser: user} = useSelector((state) => state?.auth);
   // إعداد إشعارات Expo
 Notifications.setNotificationHandler({
@@ -61,7 +64,8 @@ Notifications.setNotificationHandler({
     channel.bind("Illuminate\\Notifications\\Events\\BroadcastNotificationCreated", (event: any) => {
       // console.log("📩 إشعار جديد: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo", event?.data);
       console.log(event?.data?.title, 'title');
-      console.log(event?.data?.body, 'body')
+      console.log(event?.data?.body, 'body');
+      dispatch(newNotification());
 
       // استخراج البيانات المهمة من الحدث
       // const { title, body, icon, url } = event;
@@ -92,19 +96,9 @@ Notifications.setNotificationHandler({
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="notification" options={{ headerShown: false }} />
-      {/* <Stack.Screen name="find-ride" options={{ headerShown: false }} /> */}
-      {/* <Stack.Screen
-        name="confirm-ride"
-        options={{
-          headerShown: false,
-        }}
-      /> */}
-      {/* <Stack.Screen
-        name="book-ride"
-        options={{
-          headerShown: false,
-        }}
-      /> */}
+      {/* <Stack.Screen name="currentRide" options={{ headerShown: false }} /> */}
+      <Stack.Screen name="currentRide/[orderId]" options={{ headerShown: false }} />
+     
     </Stack>
   );
 };

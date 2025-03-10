@@ -7,6 +7,7 @@ import API from '@/redux/features/MainApi';
 import { useSelector } from 'react-redux';
 import { icons, images } from '@/constants';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 
 const Rides = () => {
@@ -165,10 +166,10 @@ const Rides = () => {
             </View>
             <View className='flex flex-row-reverse items-center justify-between w-full '>
               <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
-              <View>
+              <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
                 {/* <ArrowRight  /> */}
                 <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
-              </View>
+              </TouchableOpacity>
             </View>
 
             
