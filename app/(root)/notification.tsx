@@ -1,19 +1,9 @@
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect } from 'react';
-import { icons, images } from '@/constants';
-import { router } from 'expo-router';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { format, parseISO } from 'date-fns';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
 // const Notification = () => {
 //   // current user
 //   const { currentUser: user, isNewNotification } = useSelector((state: any) => state?.auth);
 
 //   // تحويل تاريخ ISO إلى تنسيق مناسب
-  const convertToDate = (isoString: string) => format(parseISO(isoString), 'yyyy-MM-dd');
-  const convertToTime = (isoString: string) => format(parseISO(isoString), 'HH:mm');
 
 //   // دالة جلب البيانات مع التمرير اللانهائي
 //   const fetchNotifications = async ({ pageParam = 1 }) => {
@@ -91,17 +81,24 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 // };
 
 // export default Notification;
-
-
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { icons, images } from '@/constants';
+import { router } from 'expo-router';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { format, parseISO } from 'date-fns';
 
 const Notification = () => {
   const queryClient = useQueryClient();
 
-  // الحصول على المستخدم وحالة الإشعارات الجديدة
-  const { currentUser: user, isNewNotification } = useSelector((state: any) => state?.auth); 
+  const convertToDate = (isoString) => format(parseISO(isoString), 'yyyy-MM-dd');
+  const convertToTime = (isoString) => format(parseISO(isoString), 'HH:mm');
+
+  const { currentUser: user, isNewNotification } = useSelector((state) => state?.auth);
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
-    console.log(`🔄 جلب الصفحة ${pageParam} من الإشعارات...`);
     const res = await axios.get(`https://ajwan.mahmoudalbatran.com/api/notifications?page=${pageParam}&limit=15`, {
       headers: { Authorization: `Bearer ${user?.data?.token}` },
     });
@@ -112,27 +109,27 @@ const Notification = () => {
     };
   };
 
-  // استخدام useInfiniteQuery لتحميل البيانات تدريجيًا
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isLoading,
   } = useInfiniteQuery({
     queryKey: ['notifications'],
     queryFn: fetchNotifications,
     getNextPageParam: (lastPage) => lastPage.nextPage || null,
   });
 
-  // إعادة تحميل الإشعارات عند تغيير isNewNotification
-  useEffect(() => {
+  React.useEffect(() => {
     if (isNewNotification) {
-      console.log("🔄 إشعار جديد: إعادة تحميل الإشعارات...");
       queryClient.invalidateQueries(['notifications']);
     }
   }, [isNewNotification, queryClient]);
 
   const notifications = data?.pages.flatMap((page) => page.data) || [];
+
+  const skeletonData = Array.from({ length: 5 }).map((_, index) => ({ id: index }));
 
   return (
     <View>
@@ -143,41 +140,66 @@ const Notification = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={notifications}
-        keyExtractor={(item: any) => item?.id}
-        renderItem={({ item }) => (
-          <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
-            <View className="flex items-center flex-row-reverse">
-              <Image source={icons.bell} className="w-6 h-6 ml-4" />
-              <Text className="text-gray-400 my-1 text-md">{item?.data?.body}</Text>
-            </View>
-
-            <View className="flex flex-row-reverse items-center justify-between w-full">
-              <View className="flex flex-row items-center">
-                <Text className="text-gray-500 text-sm font-semibold -ml-4">{convertToDate(item?.created_at)}</Text>
-                <Image source={icons.clock} className="w-4 h-4 ml-3" />
+      {isLoading ? (
+        <FlatList
+          data={skeletonData}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={() => (
+            <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
+              <View className="flex items-center flex-row-reverse">
+                <View className="w-6 h-6 bg-gray-300 rounded-full ml-4" />
+                <View className="h-4 w-32 bg-gray-300 rounded my-1" />
               </View>
-              <View className="flex flex-row items-center">
-                <Text className="text-gray-500 text-sm font-semibold">{convertToTime(item?.created_at)}</Text>
-                <Image source={icons.date} className="w-6 h-6 ml-1" />
+
+              <View className="flex flex-row-reverse items-center justify-between w-full">
+                <View className="flex flex-row items-center">
+                  <View className="h-3 w-20 bg-gray-300 rounded ml-4" />
+                  <View className="w-4 h-4 bg-gray-300 rounded-full ml-3" />
+                </View>
+                <View className="flex flex-row items-center">
+                  <View className="h-3 w-10 bg-gray-300 rounded" />
+                  <View className="w-6 h-6 bg-gray-300 rounded-full ml-1" />
+                </View>
               </View>
             </View>
+          )}
+        />
+      ) : (
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => item?.id}
+          renderItem={({ item }) => (
+            <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
+              <View className="flex items-center flex-row-reverse">
+                <Image source={icons.bell} className="w-6 h-6 ml-4" />
+                <Text className="text-gray-400 my-1 text-md">{item?.data?.body}</Text>
+              </View>
 
-          </View>
-        )}
-        onEndReached={() => {
-          if (hasNextPage) fetchNextPage();
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={isFetchingNextPage ? <Text className="text-center py-2">جارٍ تحميل المزيد...</Text> : <View style={{ height: 200 }} />}
-        ListEmptyComponent={() => (
-          <View className="flex flex-col items-center justify-center">
-            <Image source={images.noResult} className="w-40 h-40" resizeMode="contain" />
-            <Text className="text-sm">لا توجد إشعارات حديثة</Text>
-          </View>
-        )}
-      />
+              <View className="flex flex-row-reverse items-center justify-between w-full">
+                <View className="flex flex-row items-center">
+                  <Text className="text-gray-500 text-sm font-semibold -ml-4">{convertToDate(item?.created_at)}</Text>
+                  <Image source={icons.clock} className="w-4 h-4 ml-3" />
+                </View>
+                <View className="flex flex-row items-center">
+                  <Text className="text-gray-500 text-sm font-semibold">{convertToTime(item?.created_at)}</Text>
+                  <Image source={icons.date} className="w-6 h-6 ml-1" />
+                </View>
+              </View>
+            </View>
+          )}
+          onEndReached={() => {
+            if (hasNextPage) fetchNextPage();
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={isFetchingNextPage ? <Text className="text-center py-2">جارٍ تحميل المزيد...</Text> : <View style={{ height: 200 }} />}
+          ListEmptyComponent={() => (
+            <View className="flex flex-col items-center justify-center">
+              <Image source={images.noResult} className="w-40 h-40" resizeMode="contain" />
+              <Text className="text-sm">لا توجد إشعارات حديثة</Text>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 };

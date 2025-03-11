@@ -6,12 +6,14 @@ import * as Notifications from "expo-notifications";
 import Pusher from "pusher-js";
 
 const API_BASE = "https://ajwan.mahmoudalbatran.com/api";
+Pusher.logToConsole = true;
 
 const Chat = () => {
   const { currentUser: user } = useSelector((state) => state?.auth);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversation, setConversation] = useState(null);
+  const [userId, setUserId] = useState(user?.data?.client?.id || user?.data?.user?.id)
 
   // 🔹 جلب المحادثة والرسائل عند تحميل الصفحة
   useEffect(() => {
@@ -42,7 +44,6 @@ const Chat = () => {
 
     fetchConversation();
   }, [user]);
-
   // 🔹 جلب الرسائل
   const fetchMessages = async (conversationId) => {
     try {
@@ -77,7 +78,7 @@ const Chat = () => {
           {
             id: Date.now(),
             body: newMessage,
-            user_id: user?.data?.id,
+            user_id: userId,
           },
         ]);
         setNewMessage("");
@@ -88,14 +89,12 @@ const Chat = () => {
   };
 
   // 🔹 الاستماع للرسائل الجديدة من `Pusher`
-  useEffect(() => {
-    if (!user?.data?.id) return;
 
     try {
       const pusher = new Pusher("e555a04b01aa13290f85", {
         cluster: "ap3",
         encrypted: true,
-        authEndpoint: `${API_BASE}/broadcasting/auth`,
+        authEndpoint: "https://ajwan.mahmoudalbatran.com/broadcasting/auth",
         auth: {
           headers: {
             Authorization: `Bearer ${user?.data?.token}`,
@@ -104,7 +103,7 @@ const Chat = () => {
       });
 
       // الاشتراك في القناة الخاصة بالمستخدم
-      const channel = pusher.subscribe(`presence-Messenger.${user?.data?.id}`);
+      const channel = pusher.subscribe(`Messenger.${userId}`);
 
       // استقبال الرسائل الجديدة من الحدث "new-message"
       channel.bind("new-message", (event) => {
@@ -117,13 +116,12 @@ const Chat = () => {
         }
       });
 
-      return () => {
-        pusher.unsubscribe(`presence-Messenger.${user?.data?.id}`);
-      };
+      // return () => {
+      //   pusher.unsubscribe(`presence-Messenger.${user?.data?.id}`);
+      // };
     } catch (error) {
       console.log("Error initializing Pusher:", error);
     }
-  }, [user, conversation]);
 
   // 🔹 دالة إرسال الإشعار عند استقبال رسالة جديدة
   const sendPushNotification = async (senderName, messageBody) => {
@@ -142,7 +140,7 @@ const Chat = () => {
       {/* العنوان */}
       <View className="bg-gray-800 p-4">
         <Text className="text-white text-center text-lg font-bold">
-          المحادثة {conversation?.participants?.[0]?.name || ""}
+          {conversation?.id}المحادثة {conversation?.participants?.[0]?.name || ""}
         </Text>
       </View>
 
@@ -150,11 +148,10 @@ const Chat = () => {
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id.toString()}
-        inverted // لعرض أحدث الرسائل في الأسفل
         renderItem={({ item }) => (
           <View
             className={`mb-3 p-3 rounded-lg max-w-[75%] ${
-              item.user_id === user?.data?.id ? "bg-blue-500 self-end" : "bg-gray-700 self-start"
+              item.user_id == userId ? "bg-blue-500 self-end" : "bg-gray-700 self-start"
             }`}
           >
             <Text className="text-white">{item?.body}</Text>
@@ -165,7 +162,7 @@ const Chat = () => {
 
       {/* إدخال رسالة جديدة */}
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <View className="flex-row items-center bg-gray-800 p-3">
+        <View className="flex-row items-center bg-gray-800 p-3 mb-[6rem]">
           <TextInput
             className="flex-1 bg-gray-700 text-white p-3 rounded-lg mr-2"
             placeholder="اكتب رسالة..."

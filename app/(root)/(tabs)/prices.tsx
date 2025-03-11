@@ -1,7 +1,9 @@
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { icons, images } from '@/constants';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
   const prices = [
@@ -48,7 +50,17 @@ const Profile = () => {
       price: '5',
       time: '5',
     }
-  ]
+  ];
+  
+
+
+  // const [prices, setPrices] = useState([]);
+  // const {currentUser: user} = useSelector((state) => state?.auth);
+  // const getPrices = async () => {
+  //   const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/prices', {
+  //     headers: { Authorization: `Bearer ${user?.data?.token}` },
+  //   })
+  // }
   return (
     <View>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
