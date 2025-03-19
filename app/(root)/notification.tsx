@@ -81,6 +81,8 @@
 // };
 
 // export default Notification;
+
+
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { icons, images } from '@/constants';
@@ -100,7 +102,7 @@ const Notification = () => {
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const res = await axios.get(`https://ajwan.mahmoudalbatran.com/api/notifications?page=${pageParam}&limit=15`, {
-      headers: { Authorization: `Bearer ${user?.data?.token}` },
+      headers: { Authorization: `Bearer ${user?.data}` },
     });
 
     return {

@@ -235,35 +235,35 @@ export default function Page() {
     requestLocation();
   }, []);
 
-  useEffect(() => {
-    const checkAuth = async () => {
+  // useEffect(() => {
+  //   const checkAuth = async () => {
 
-      if (!user?.data?.token) {
-        router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
-        return;
-      }
+  //     if (!user?.data?.token) {
+  //       router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
+  //       return;
+  //     }
 
-      try {
-        const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
-          headers: {
-            Authorization: `Bearer ${user?.data?.token}`
-           }
-        })
+  //     try {
+  //       const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
+  //         headers: {
+  //           Authorization: `Bearer ${user?.data?.token}`
+  //          }
+  //       })
 
-        if (!res.data) {
-          dispatch(logout())
-          router.replace("/(auth)/sign-in");
+  //       if (!res.data) {
+  //         dispatch(logout())
+  //         router.replace("/(auth)/sign-in");
 
-        }
+  //       }
 
-      } catch (error) {
-        dispatch(logout());
-        router.replace("/(auth)/sign-in");
-      }
-    };
+  //     } catch (error) {
+  //       dispatch(logout());
+  //       router.replace("/(auth)/sign-in");
+  //     }
+  //   };
 
-    checkAuth();
-  }, [user]);
+  //   checkAuth();
+  // }, [user]);
 
   const generateMap = () => {
     const mapHtml = `

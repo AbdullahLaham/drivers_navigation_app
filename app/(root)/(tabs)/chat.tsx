@@ -4,9 +4,20 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import * as Notifications from "expo-notifications";
 import Pusher from "pusher-js";
+import { runPusher } from "../_layout";
+
 
 const API_BASE = "https://ajwan.mahmoudalbatran.com/api";
+
+
+
+
+
 Pusher.logToConsole = true;
+
+
+
+
 
 const Chat = () => {
   const { currentUser: user } = useSelector((state) => state?.auth);
@@ -91,19 +102,9 @@ const Chat = () => {
   // 🔹 الاستماع للرسائل الجديدة من `Pusher`
 
     try {
-      const pusher = new Pusher("e555a04b01aa13290f85", {
-        cluster: "ap3",
-        encrypted: true,
-        authEndpoint: "https://ajwan.mahmoudalbatran.com/broadcasting/auth",
-        auth: {
-          headers: {
-            Authorization: `Bearer ${user?.data?.token}`,
-          },
-        },
-      });
-
+     const pusher = runPusher(user);
       // الاشتراك في القناة الخاصة بالمستخدم
-      const channel = pusher.subscribe(`Messenger.${userId}`);
+      const channel = pusher.subscribe(`presence-Messenger.${userId}`);
 
       // استقبال الرسائل الجديدة من الحدث "new-message"
       channel.bind("new-message", (event) => {

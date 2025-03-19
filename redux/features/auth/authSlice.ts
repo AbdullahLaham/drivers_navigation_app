@@ -56,6 +56,20 @@ export const login = createAsyncThunk('auth/login', async (user: any, thunkAPI) 
 });
 
 
+
+export const verify = createAsyncThunk('auth/login/verify', async (user: any, thunkAPI) => {
+    try {
+      //   return await authService.login(user);
+      const res =  await API.post('/login/verify', user);
+      return res;
+  
+        
+    } catch (error: any) {
+        return thunkAPI.rejectWithValue(error?.response?.data?.message! || "حدث خطأ أثناء التسجيل");
+    }
+  
+  });
+
 export const register = createAsyncThunk('auth/register', async (user: any, thunkAPI) => {
   try {
     // service code
@@ -142,8 +156,6 @@ export const authSlice = createSlice({
      builder
 
     .addCase(login.pending,(state) => {state.isLoading = true }  )
-    
-    
     .addCase(login.fulfilled,(state, action: PayloadAction<any>) => {
         state.isLoading = false ;
         state.isError = false ;
@@ -156,6 +168,33 @@ export const authSlice = createSlice({
     })
 
     .addCase(login.rejected,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = true;
+        state.isSuccess = false;
+        state.currentUser = null;
+        state.error = action.payload;
+        if (state?.isError) {
+            toast.error("something went wrong");
+        }
+        // state.message = action.error;
+    })
+
+
+
+
+    .addCase(verify.pending,(state) => {state.isLoading = true }  )
+    .addCase(verify.fulfilled,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = false ;
+        state.isSuccess = true;
+        state.currentUser = action?.payload;
+        state.error = '';
+        if (state?.isSuccess) {
+            toast.success("user entered successfully");
+        }
+    })
+
+    .addCase(verify.rejected,(state, action: PayloadAction<any>) => {
         state.isLoading = false ;
         state.isError = true;
         state.isSuccess = false;

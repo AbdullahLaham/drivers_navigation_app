@@ -16,12 +16,12 @@
         "NSLocationWhenInUseUsageDescription": "We need your location to display the map."
       }
     },
-    
     "android": {
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
+        "ACCESS_BACKGROUND_LOCATION",
+        "POST_NOTIFICATIONS"
       ],
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
@@ -44,6 +44,17 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "mode": "automatic",
+          "ios": {
+            "allowAlert": true,
+            "allowBadge": true,
+            "allowSound": true
+          }
         }
       ]
     ],

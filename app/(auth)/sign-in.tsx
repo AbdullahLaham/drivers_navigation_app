@@ -1,6 +1,6 @@
 import { Link, router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 // import OAuth from "@/components/OAuth";
@@ -31,7 +31,7 @@ const SignIn = () => {
 
   const onSignInPress = useCallback(async () => {
     // if (!isLoaded) return;
-    // setLoading(true);
+    setLoading(true);
 
     try {
 
@@ -60,6 +60,7 @@ const SignIn = () => {
       console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error");
     }finally {
+      setLoading(false);
     }
   }, [ form]);
 
@@ -114,12 +115,19 @@ const SignIn = () => {
             className="mt-6"
           />} */}
 
-        <CustomButton
+        
+        {loading ? (
+            <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5">
+              <ActivityIndicator size={30} color="blue" />
+            </View>
+          ) : (
+            <CustomButton
                   
           title="تسجيل الدخول"
           onPress={onSignInPress}
           className="mt-6"
         />
+          )}
 
           {/* <OAuth /> */}
 

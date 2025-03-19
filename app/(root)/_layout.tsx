@@ -15,11 +15,29 @@ import { newNotification } from "@/redux/features/auth/authSlice";
 Pusher.logToConsole = true;
 
 
+
+
+
+export const runPusher =  (user: any) => {
+   const pusher = new Pusher("e555a04b01aa13290f85", {
+    cluster: "ap3",
+    encrypted: true,
+    
+    authEndpoint: "https://ajwan.mahmoudalbatran.com/broadcasting/auth", 
+      auth: {
+        headers: {
+          Authorization: `Bearer ${user?.data?.token}`, // إرسال JWT Token للمصادقة
+        },
+      },
+  });
+  return pusher;
+}
+
+
 const Layout = () => {
   console.log('hekko');
   const dispatch = useAppDispatch();
-  const {currentUser: user} = useSelector((state) => state?.auth);
-  // إعداد إشعارات Expo
+  const {currentUser: user, error, isError} = useSelector((state: any) => state?.auth);  // إعداد إشعارات Expo
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -39,19 +57,7 @@ Notifications.setNotificationHandler({
 
 
   try {
-    const pusher = new Pusher("e555a04b01aa13290f85", {
-      cluster: "ap3",
-      encrypted: true,
-      
-      authEndpoint: "https://ajwan.mahmoudalbatran.com/broadcasting/auth", // Laravel API للمصادقة
-        auth: {
-          headers: {
-            Authorization: `Bearer ${user?.data?.token}`, // إرسال JWT Token للمصادقة
-          },
-        },
-    });
-    
-
+    const pusher = runPusher(user);
     // الاشتراك في القناة
     const channel = pusher.subscribe(`private-App.Models.User.${user?.data?.user?.id || user?.data?.client?.id}`); // غير "my-channel" إلى القناة الصحيحة
 

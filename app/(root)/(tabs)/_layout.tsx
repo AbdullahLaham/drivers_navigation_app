@@ -16,13 +16,13 @@ const TabIcon = ({
     className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-general-700" : ""}`}
   >
     <View
-      className={`rounded-full w-12 h-12 p-5 items-center justify-center  ${focused ? "bg-general-400" : ""}`}
+      className={`rounded-full w-12 h-12 p-5 ml-3 items-center justify-center  ${focused ? "bg-general-400" : ""}`}
     >
       <Image
         source={source}
         tintColor="white"
         resizeMode="contain"
-        className="w-10 h-10"
+        className="w-10 h-10 "
       />
     </View>
   </SafeAreaView>

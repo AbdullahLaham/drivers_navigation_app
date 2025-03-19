@@ -1,209 +1,118 @@
-import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-// import { ArrowRight, CalendarDaysIcon, Clock, MapPin,  Target } from "lucide-react-native";
+import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { format, parseISO } from "date-fns";
 import axios from 'axios';
-import API from '@/redux/features/MainApi';
 import { useSelector } from 'react-redux';
 import { icons, images } from '@/constants';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
-
 const Rides = () => {
-  const [state, setState] = useState<any>("pending");
+  const [state, setState] = useState("pending");
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const lastDate = requests?.length ? format(requests?.[requests?.length - 1]?.['created_at'], "MM/yyyy") : '02/2025'
+  const lastDate = requests?.length ? format(requests?.[requests?.length - 1]?.['created_at'], "MM/yyyy") : '02/2025';
 
-  // current user
-  const {currentUser: user, isNewRide} = useSelector((state: any) => state?.auth);
-
+  const { currentUser: user, isNewRide } = useSelector((state) => state?.auth);
+console.log(requests, 'rrrrrrrrrrrrrr')
   const getOrders = async () => {
-      console.log('requsting ............................')
-      const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/orders',
-    {
-     headers: {
-      Authorization: `Bearer ${user?.data?.token}`
-     } 
-    });
-    
-    setRequests(res?.data?.orders);
-    
-      // const res = await API.get('https://ajwan.mahmoudalbatran.com/api/orders');
-  
-      console.log('res', res?.data?.orders);
-      // setRequests(res?.data);
+    setLoading(true);
+    try {
+      const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/orders', {
+        headers: {
+          Authorization: `Bearer ${user?.data?.token}`
+        }
+      });
+      setRequests(res?.data?.orders);
+    } catch (error) {
+      console.error("Error fetching orders", error);
     }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    
-    
     getOrders();
-    
   }, [isNewRide]);
 
-  const convertToDate = (isoString: any) => {
-    return format(parseISO(isoString), "yyyy-MM-dd");
-  };
+  const convertToDate = (isoString) => format(parseISO(isoString), "yyyy-MM-dd");
+  const convertToTime = (isoString) => format(parseISO(isoString), "HH:mm:ss");
 
-   const convertToTime = (isoString: any) => {
-    return format(parseISO(isoString), "HH:mm:ss");
-  };
-
-  // const requests = [
-  //   {
-  //     id: 1,
-  //     startLoc: 'المغازي السوق بجانب الاحسان',
-  //     endLoca: 'غزة الاحسان. بجانب السوق',
-  //     date: '5/4/2023',
-  //     price: '5',
-  //     time: '12:5 pm',
-  //   },
-  //   {
-  //     id: 2,
-  //     startLoc: 'المغازي السوق بجانب الاحسان',
-  //     endLoca: 'غزة الاحسان. بجانب السوق',
-  //     date: '5/4/2023',
-  //     price: '5',
-  //     time: '12:5 pm',
-  //   },
-  //   {
-  //     id: 3,
-  //     startLoc: 'المغازي السوق بجانب الاحسان',
-  //     endLoca: 'غزة الاحسان. بجانب السوق',
-  //     date: '5/4/2023',
-  //     price: '5',
-  //     time: '12:5 pm',
-  //   },
-  //   {
-  //     id: 4,
-  //     startLoc: 'المغازي السوق بجانب الاحسان',
-  //     endLoca: 'غزة الاحسان. بجانب السوق',
-  //     date: '5/4/2023',
-  //     price: '5',
-  //     time: '12:5 pm',
-  //   },
-  //   {
-  //     id: 5,
-  //     startLoc: 'المغازي السوق بجانب الاحسان',
-  //     endLoca: 'غزة الاحسان. بجانب السوق',
-  //     date: '5/4/2023',
-  //     price: '5',
-  //     time: '12:5 pm',
-  //   }
-  // ];
+  const renderSkeleton = () => (
+    <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+      <View className='flex items-center flex-row-reverse'>
+        <View className='w-6 h-6 bg-gray-300 rounded-full ml-4' />
+        <View className='w-40 h-4 bg-gray-300 rounded-md' />
+      </View>
+      <View className='flex items-center flex-row-reverse mt-2'>
+        <View className='w-6 h-6 bg-gray-300 rounded-full ml-4' />
+        <View className='w-40 h-4 bg-gray-300 rounded-md' />
+      </View>
+      <View className='flex flex-row-reverse items-center justify-between w-full mt-2'>
+        <View className='w-20 h-4 bg-gray-300 rounded-md' />
+        <View className='w-16 h-4 bg-gray-300 rounded-md' />
+      </View>
+      <View className='flex flex-row-reverse items-center justify-between w-full mt-2'>
+        <View className='w-12 h-6 bg-gray-300 rounded-md' />
+        <View className='w-24 h-6 bg-blue-300 rounded-md' />
+      </View>
+    </View>
+  );
 
   return (
-      <SafeAreaView>
+    <SafeAreaView>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
-        طلباتك
+        طلباتك {requests?.length}
       </Text>
-      <View className='flex flex-row-reverse items-center justify-between p-5 '>
-        <View className={`flex items-center justify-center rounded-lg ${state == 'done' ? 'bg-blue-400 text-white ' : ''}`} >
-
-          <TouchableOpacity className='px-10 py-3' onPress={() => setState('done')}>
-            <Text className={`font-semibold ${state == 'done' ? 'text-white' : 'text-black'}`} >
-              مكتمله
-            </Text>
-          </TouchableOpacity>
-
-
-        </View>
-        <View className={`flex items-center justify-center  rounded-lg  ${state == 'pending' ? 'bg-blue-400 text-white ' : ''}`}>
-          <TouchableOpacity className='px-10 py-3' onPress={() => setState('pending')}>
-            <Text className={`font-semibold ${state == 'pending' ? 'text-white' : 'text-black'}`} >
-              قيد الانتظار
-            </Text>
-          </TouchableOpacity>
-
-        </View>
-        <View className={`flex items-center justify-center  rounded-lg  ${state == 'canceled' ? 'bg-blue-400 text-white ' : ''}`}>
-          <TouchableOpacity className='px-10 py-3' onPress={() => setState('canceled')}>
-            <Text className={`font-semibold ${state == 'canceled' ? 'text-white' : 'text-black'}`} >
-              تم الغائها
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <View className='flex flex-row-reverse items-center justify-between p-5'>
+        <TouchableOpacity className={`px-10 py-3 rounded-lg ${state === 'done' ? 'bg-blue-400 text-white' : ''}`} onPress={() => setState('done')}>
+          <Text className={`font-semibold ${state === 'done' ? 'text-white' : 'text-black'}`}>مكتمله</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className={`px-10 py-3 rounded-lg ${state === 'pending' ? 'bg-blue-400 text-white' : ''}`} onPress={() => setState('pending')}>
+          <Text className={`font-semibold ${state === 'pending' ? 'text-white' : 'text-black'}`}>قيد الانتظار</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className={`px-10 py-3 rounded-lg ${state === 'canceled' ? 'bg-blue-400 text-white' : ''}`} onPress={() => setState('canceled')}>
+          <Text className={`font-semibold ${state === 'canceled' ? 'text-white' : 'text-black'}`}>تم الغائها</Text>
+        </TouchableOpacity>
       </View>
 
+      <TextInput className='w-full border-none outline-none rtl px-3 py-2 bg-gray-100 placeholder:text-gray-300 placeholder:text-end' placeholder='بحث' />
+      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex flex-row-reverse mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
 
-      <View>
-        <TextInput className='w-full border-none outline-none rtl px-3 py-2 bg-gray-100 placeholder:text-gray-300 placeholder:text-end' placeholder='بحث' />
-        {/* <search /> */}
-
-      </View>
-      <Text className='font-bold text-lg text-gray-600 my-1 w-full flex flex-row-reverse   mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي في شهر {lastDate}</Text>
-       
       <FlatList
-        data={requests}
-        keyExtractor={(item: any) => item?.id}
-        renderItem={({ item }) => (
-          <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1  border-b r border-gray-400 p-1 rounded-sm'>
-            <View className='flex items-center flex-row-reverse '>
-              {/* <MapPin color="green" size={20} /> */}
-              <Image source={icons.point} className={`w-6 h-6 ml-4`}/>
-              <Text className='text-gray-400 my-1  text-md'>{item?.from}</Text>
+        data={loading ? Array(5).fill({}) : requests}
+        keyExtractor={(item, index) => loading ? `skeleton-${index}` : item?.id}
+        renderItem={({ item }) => loading ? renderSkeleton() : (
+          <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+            <View className='flex items-center flex-row-reverse'>
+              <Image source={icons.point} className='w-6 h-6 ml-4' />
+              <Text className='text-gray-400 my-1 text-md'>{item?.from}</Text>
             </View>
-            <View className='flex items-center flex-row-reverse '>
-              {/* <Target color="red" size={20} /> */}
-              <Image source={icons.to} className={`w-6 h-6 ml-4`}/>
-              <Text className='text-gray-400 my-1  text-md'>{item?.to}</Text>
+            <View className='flex items-center flex-row-reverse'>
+              <Image source={icons.to} className='w-6 h-6 ml-4' />
+              <Text className='text-gray-400 my-1 text-md'>{item?.to}</Text>
             </View>
-            
-            
-            
-            <View className='flex flex-row-reverse items-center justify-between w-full '>
-              <View className='flex flex-row items-center '>
-                <Text className='text-gray-500 text-sm font-semibold -ml-2'>{convertToDate(item?.created_at)} </Text>
-                {/* <CalendarDaysIcon size={22} color="gray" /> */}
-                <Image source={icons.clock} className={`w-6 h-6 ml-3`}/>
+            <View className='flex flex-row-reverse items-center justify-between w-full'>
+              <View className='flex flex-row items-center'>
+                <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)}</Text>
+                <Image source={icons.clock} className='w-6 h-6 ml-3' />
               </View>
-              <View className='flex flex-row  items-center'><Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)} </Text>
-              {/* <Clock size={22} color="gray" className='font-bold' /> */}
-              <Image source={icons.date} className={`w-6 h-6 ml-1`}/>
+              <View className='flex flex-row items-center'>
+                <Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)}</Text>
+                <Image source={icons.date} className='w-6 h-6 ml-1' />
               </View>
             </View>
-            <View className='flex flex-row-reverse items-center justify-between w-full '>
-              <View className='flex flex-row items-center gap-2'><Text className='text-gray-500 text-md' >{item?.price || 5}</Text><Text className='text-lg' style={{  fontWeight: "bold", color: "black" }}>₪</Text></View>
+            <View className='flex flex-row-reverse items-center justify-between w-full'>
+              <View className='flex flex-row items-center'><Text className='text-gray-500 text-md'>{item?.price || 5}</Text><Text className='text-lg font-bold text-black'>₪</Text></View>
               <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
-                {/* <ArrowRight  /> */}
                 <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
               </TouchableOpacity>
             </View>
-
-            
-
           </View>
-        )
-        
-      }
-
-      nestedScrollEnabled={true}
-      ListEmptyComponent={() => (
-        <View className="flex flex-col items-center justify-center">
-            
-            <>
-              <Image
-                source={images.noResult}
-                className="w-40 h-40"
-                alt="No recent rides found"
-                resizeMode="contain"
-              />
-              <Text className="text-sm">No recent rides found</Text>
-            </>
-          
-        </View>
-      )}
-      ListFooterComponent={<View style={{ height: 200 }} />} // يضيف هامشًا بعد العنصر الأخير
+        )}
       />
-
-
-
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Rides
-
-const styles = StyleSheet.create({})
+export default Rides;

@@ -19,6 +19,22 @@ const login = async (user: any) => {
     }
 }
 
+const verify = async (user: any) => {
+    try {
+       const res =  await API.post('/login/verify', user);
+       if (res.data) {
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+        
+       }
+       
+       return res.data;
+
+
+    } catch (error) {
+        throw new Error("something went wrong");
+    }
+}
+// /login/verify
 const signUp = async (user: any) => {
     try {
         console.log('hello from sservice' , user);
@@ -88,4 +104,4 @@ const logout = async () => {
     // localStorage.clear();
 }
 
-export default {login, signUp, logout, addListingToWishlist, removeListingFromWishlist, getWishlist};
+export default {login, signUp, logout, addListingToWishlist, removeListingFromWishlist, getWishlist, verify} ;
