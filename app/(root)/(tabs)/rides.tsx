@@ -1,11 +1,13 @@
 import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { format, parseISO } from "date-fns";
+import React, { useCallback, useEffect, useState } from 'react';
+import { format, formatDistanceToNow, parseISO } from "date-fns";
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { icons, images } from '@/constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const Rides = () => {
   const [state, setState] = useState("pending");
@@ -31,13 +33,23 @@ console.log(requests, 'rrrrrrrrrrrrrr')
     setLoading(false);
   };
 
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Page reloaded'); 
+      getOrders();
+      // You can also trigger state updates or re-fetch data here.
+    }, [])
+  );
+
+
+  
   useEffect(() => {
     getOrders();
   }, [isNewRide]);
 
   const convertToDate = (isoString) => format(parseISO(isoString), "yyyy-MM-dd");
   const convertToTime = (isoString) => format(parseISO(isoString), "HH:mm:ss");
-
   const renderSkeleton = () => (
     <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
       <View className='flex items-center flex-row-reverse'>
@@ -104,12 +116,19 @@ console.log(requests, 'rrrrrrrrrrrrrr')
             </View>
             <View className='flex flex-row-reverse items-center justify-between w-full'>
               <View className='flex flex-row items-center'><Text className='text-gray-500 text-md'>{item?.price || 5}</Text><Text className='text-lg font-bold text-black'>₪</Text></View>
+              
               <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
                 <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
               </TouchableOpacity>
             </View>
+            <View><Text>{formatDistanceToNow(new Date(item?.created_at), { addSuffix: true })}</Text></View>
           </View>
         )}
+        ListFooterComponent={
+          <View  className='h-[20rem]' style={{ padding: 10, backgroundColor: 'white' }}>
+          </View>
+        }
+
       />
     </SafeAreaView>
   );

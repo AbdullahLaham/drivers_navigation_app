@@ -4,10 +4,11 @@
     "slug": "malltoall_navigation_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon.jpg",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ajwan.expoapp",
@@ -16,6 +17,7 @@
         "NSLocationWhenInUseUsageDescription": "We need your location to display the map."
       }
     },
+    
     "android": {
       "permissions": [
         "ACCESS_FINE_LOCATION",
@@ -25,7 +27,7 @@
       ],
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.jpg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.abdullah_lahham123.malltoall_navigation_app"

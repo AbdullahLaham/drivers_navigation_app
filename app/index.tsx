@@ -7,8 +7,15 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import Pusher from "pusher-js";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { I18nManager } from 'react-native';
+import * as Localization from 'expo-localization';
+// import * as Updates from 'expo-updates';
 
 
+I18nManager.forceRTL(true); // فرض الاتجاه من اليمين إلى اليسار
+I18nManager.allowRTL(true); // السماح بالتبديل إلى RTL إذا كانت اللغة تدعمه
+
+const isRTL = Localization.isRTL; // التحقق مما إذا كانت اللغة الحالية RTL
 
 const Home = () => {
   //   useEffect(() => {

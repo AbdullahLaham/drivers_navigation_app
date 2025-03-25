@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image, SafeAreaView } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity, Image, SafeAreaView, ActivityIndicator } from "react-native";
 // import MapView, { Marker, Polyline, UrlTile } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -16,7 +16,7 @@ import usePusherNotifications from "@/hooks/usePusherNotifications";
 
 export default function Page() {
   // current user
-  const {currentUser: user} = useSelector((state: any) => state?.auth);
+  const { currentUser: user } = useSelector((state: any) => state?.auth);
   // dispatch
   const dispatch = useAppDispatch();
 
@@ -29,6 +29,7 @@ export default function Page() {
   const [inpuEndLocation, setInpuEndLocation] = useState('');
   const [currentLocation, setCurrentLocation] = useState('');
   const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [startLocation, setStartLocation] = useState<any>(null);
 
@@ -99,8 +100,9 @@ export default function Page() {
   // };
 
   // create new Ride
-  
+
   const onCreateRide = async () => {
+    setLoading(true)
     console.log(user?.data?.token, 'token');
     try {
       console.log({
@@ -111,23 +113,25 @@ export default function Page() {
         from: inpuStartLocation,
         to: inpuEndLocation,
       },
-    {
-     headers: {
-      Authorization: `Bearer ${user?.data?.token}`
-     } 
-    });
+        {
+          headers: {
+            Authorization: `Bearer ${user?.data?.token}`
+          }
+        });
 
 
-    console.log('res', res);
-    if (res?.data) {
-      setInpuEndLocation("");
-      setInpuStartLocation("");
+      console.log('res', res);
+      if (res?.data) {
+        setInpuEndLocation("");
+        setInpuStartLocation("");
         alert("تم تأكيد الرحلة");
-    }
-    dispatch(createRide());
+      }
+      dispatch(createRide());
 
-    } catch(error) {
+    } catch (error) {
 
+    } finally {
+      setLoading(false)
     }
 
 
@@ -137,10 +141,10 @@ export default function Page() {
   //   const fetchLocation = async () => {
   //     await getCurrentLocation();
   //   };
-  
+
   //   fetchLocation();
   // }, []);
-  
+
   // useEffect(() => {
   //   if (mapRef.current && startLocation) {
   //     mapRef?.current?.animateToRegion({
@@ -150,18 +154,18 @@ export default function Page() {
   //     longitudeDelta: 0.01,
   //   });
   //   }
-    
+
   // }, [startLocation]);
-  
 
 
 
-// const getLocationName = async (location: any) => {
-//   const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${location?.latitude}&lon=${location?.longitude}&format=json`);
-//   console.log(res?.data, 'resres');
-//   setCurrentLocation(res?.data?.display_name  || "Location not found");
-//   return res?.data?.display_name;
-// }
+
+  // const getLocationName = async (location: any) => {
+  //   const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${location?.latitude}&lon=${location?.longitude}&format=json`);
+  //   console.log(res?.data, 'resres');
+  //   setCurrentLocation(res?.data?.display_name  || "Location not found");
+  //   return res?.data?.display_name;
+  // }
 
 
 
@@ -174,43 +178,43 @@ export default function Page() {
         console.log("طلب الإذن للموقع...");
 
         const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== "granted") {
-        Alert.alert("Permission Denied", "Please enable location services.");
-        console.log("إذن الموقع مرفوض");
-        return;
-      }
 
-      setLocationPermission(true);
-      console.log("إذن الموقع مقبول، جاري جلب الموقع...");
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Please enable location services.");
+          console.log("إذن الموقع مرفوض");
+          return;
+        }
 
-      // بعد السماح بالموقع، جلب الموقع الحالي
-      const location = await Location.getCurrentPositionAsync({});
-      console.log(location, 'locat');
-      // setCurrentLocation(location);
+        setLocationPermission(true);
+        console.log("إذن الموقع مقبول، جاري جلب الموقع...");
 
-
-      // const address = await Location.reverseGeocodeAsync({
-      //   latitude: location.coords?.latitude!,
-      //   longitude: location.coords?.longitude!,
-      // });
-      // setAddress(`${address[0].name}, ${address[0].region}`);
-
-      setStartLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      
-      // mapRef.current?.animateToRegion({
-      //   latitude: location.coords.latitude,
-      //   longitude: location.coords.longitude,
-      //   latitudeDelta: 0.01,
-      //   longitudeDelta: 0.01,
-      // }, 1000);
+        // بعد السماح بالموقع، جلب الموقع الحالي
+        const location = await Location.getCurrentPositionAsync({});
+        console.log(location, 'locat');
+        // setCurrentLocation(location);
 
 
-      // if (mapRef.current) {
+        // const address = await Location.reverseGeocodeAsync({
+        //   latitude: location.coords?.latitude!,
+        //   longitude: location.coords?.longitude!,
+        // });
+        // setAddress(`${address[0].name}, ${address[0].region}`);
+
+        setStartLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+
+        // mapRef.current?.animateToRegion({
+        //   latitude: location.coords.latitude,
+        //   longitude: location.coords.longitude,
+        //   latitudeDelta: 0.01,
+        //   longitudeDelta: 0.01,
+        // }, 1000);
+
+
+        // if (mapRef.current) {
         // mapRef.current.animateToRegion(
         //   {
         //     latitude: location.coords.latitude,
@@ -220,13 +224,13 @@ export default function Page() {
         //   },
         //   1000
         // );
-      // } else {
-      //   console.warn("mapRef.current is null, skipping animation");
-      // }
+        // } else {
+        //   console.warn("mapRef.current is null, skipping animation");
+        // }
 
 
 
-      } catch(error) {
+      } catch (error) {
         console.error("Error fetching location:", error);
         Alert.alert("Error", "Failed to get location.");
       }
@@ -302,16 +306,16 @@ export default function Page() {
     </html>
   `;
 
-  // رسم الخط بين نقطتي البداية والنهاية
-  // var latlngs = [[${startLat}, ${startLng}], [${endLat}, ${endLng}]];
-  // var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
-  // map.fitBounds(polyline.getBounds());
-  return mapHtml;
+    // رسم الخط بين نقطتي البداية والنهاية
+    // var latlngs = [[${startLat}, ${startLng}], [${endLat}, ${endLng}]];
+    // var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+    // map.fitBounds(polyline.getBounds());
+    return mapHtml;
   }
-  
+
 
   usePusherNotifications();
-  
+
   return (
     <SafeAreaView className="flex-1 relative ">
       <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 right-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
@@ -319,19 +323,19 @@ export default function Page() {
         <View className="w-2 h-2 rounded-full bg-red-500 absolute left-1 bottom-1"></View>
       </TouchableOpacity>
       {/* 🔍 مربع البحث */}
-      
-      
+
+
 
       <View className="absolute -top-10 left-0 right-0    z-10 ">
-        
-      {/* <TextInput
+
+        {/* <TextInput
         // dir='rtl'
         className="  h-[3rem] py-3 mt-[3rem]   px-3 my-1 border-none outline-none bg-gray-200 placeholder:text-gray-600 rounded-lg mx-2"
         placeholder="ابحث عن موقع..."
         value={query}
         onChangeText={(text) => setQuery(text) }
       /> */}
-      
+
         {/* {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
@@ -363,30 +367,34 @@ export default function Page() {
       </View>
 
       <WebView originWhitelist={["*"]} source={{ html: generateMap() }} />
-      
+
 
       {/* 📌  بيانات الرحلة */}
       <View className=" mt-auto mb-[5rem] flex flex-col ">
-      {/* className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2" */}
-      <View className="flex flex-row ">
-        <TouchableOpacity  onPress={() => { setInpuStartLocation(JSON.stringify(startLocation));  console.log('')}}>
-          <View className="bg-gray-300 ml-1  h-[3rem] w-[3rem] rounded-lg mt-1 flex items-center justify-center" >
-            {/* <Target color="gray" size={25} className="text-red-500 bg-red-800" /> */}
-            <Image source={icons.pin} className={`w-5 h-6`}/>
-          </View>
-        </TouchableOpacity>
-        <TextInput className="flex-1 rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
-      </View>
-      <TextInput
-        className="rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]"
-        // value={query}
-        value={inpuEndLocation}
-        onChangeText={(text) => setInpuEndLocation(text)}
-        placeholder="الوجهة"
-      />
+        {/* className="flex flex-raw w-full items-center justify-start gap-1 rounded-md mx-2" */}
+        <View className="flex flex-row ">
+          <TouchableOpacity onPress={() => { setInpuStartLocation(JSON.stringify(startLocation)); console.log('') }}>
+            <View className="bg-gray-300 ml-1  h-[3rem] w-[3rem] rounded-lg mt-1 flex items-center justify-center" >
+              {/* <Target color="gray" size={25} className="text-red-500 bg-red-800" /> */}
+              <Image source={icons.pin} className={`w-5 h-6`} />
+            </View>
+          </TouchableOpacity>
+          <TextInput className="flex-1 rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
+        </View>
+        <TextInput
+          className="rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]"
+          // value={query}
+          value={inpuEndLocation}
+          onChangeText={(text) => setInpuEndLocation(text)}
+          placeholder="الوجهة"
+        />
 
         {/* <Text>المسافة: 🚗 (يتم الحساب...) | الوقت: ⏳ | السعر: 💰</Text> */}
-        <Button  title="تأكيد الرحلة" onPress={() => onCreateRide()} />
+        {loading ? (
+          <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5">
+            <ActivityIndicator size={30} color="blue" />
+          </View>
+        ) : <Button title="تأكيد الرحلة" onPress={() => onCreateRide()} />}
 
         {/* {endLocation && (
           

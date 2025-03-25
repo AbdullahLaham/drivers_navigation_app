@@ -84,9 +84,9 @@
 
 
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { icons, images } from '@/constants';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
@@ -102,7 +102,7 @@ const Notification = () => {
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const res = await axios.get(`https://ajwan.mahmoudalbatran.com/api/notifications?page=${pageParam}&limit=15`, {
-      headers: { Authorization: `Bearer ${user?.data}` },
+      headers: { Authorization: `Bearer ${user?.data?.token}` },
     });
 
     return {
@@ -129,6 +129,16 @@ const Notification = () => {
     }
   }, [isNewNotification, queryClient]);
 
+  
+useFocusEffect(
+    useCallback(() => {
+      if (isNewNotification) {
+        queryClient.invalidateQueries(['notifications']);
+      }
+      console.log('Page reloaded'); 
+      // You can also trigger state updates or re-fetch data here.
+    }, [])
+  );
   const notifications = data?.pages.flatMap((page) => page.data) || [];
 
   const skeletonData = Array.from({ length: 5 }).map((_, index) => ({ id: index }));
@@ -172,6 +182,8 @@ const Notification = () => {
           keyExtractor={(item) => item?.id}
           renderItem={({ item }) => (
             <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
+              
+              
               <View className="flex items-center flex-row-reverse">
                 <Image source={icons.bell} className="w-6 h-6 ml-4" />
                 <Text className="text-gray-400 my-1 text-md">{item?.data?.body}</Text>
