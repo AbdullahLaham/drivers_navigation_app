@@ -8,6 +8,7 @@ import { runPusher } from "../_layout";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { icons } from "@/constants";
+import { useConversationStore } from "@/lib/conversationStore";
 
 
 const API_BASE = "https://ajwan.mahmoudalbatran.com/api";
@@ -32,6 +33,8 @@ const Chat = () => {
 
     const { conversationId } = useLocalSearchParams();
 
+    // currentConversation
+    const currentCon = useConversationStore((state) => state.currentCon);
 
     console.log('user?.data?.token', user?.data?.token, 'user?.data?.tokenuser?.data?.tokenuser?.data?.token')
 
@@ -227,14 +230,13 @@ const Chat = () => {
             {/* العنوان */}
             <View className="bg-gray-800 p-4 flex flex-row items-center gap-2 justify-center">
                 <Text className="text-white text-center text-lg font-bold flex flex-row items-center">
-                    {/* {conversation?.participants?.[0]?.name || ""}  */}
-                    conversation_id
+                    {currentCon?.participants?.[0]?.name || ""} 
                 </Text>
 
                 <TouchableOpacity className="ml-auto absolute right-4 top-2 rounded-full px-2 py-1 mt-1" onPress={() => router.push('/(root)/(tabs)/chat')}>
                     <Image source={icons.arrowRight} className="w-8 h-8 rounded-full p-2" />
                 </TouchableOpacity>
-                <View className=" rounded-full h-[30px] w-[30px] border-[3px] border-gray-300 shadow-sm shadow-neutral-300 flex items-center justify-center bg-purple-500 "><Text className="uppercase font-bold text-md text-white ">{conversationId}</Text></View>
+                <View className=" rounded-full h-[30px] w-[30px] border-[3px] border-gray-300 shadow-sm shadow-neutral-300 flex items-center justify-center bg-purple-500 "><Text className="uppercase font-bold text-md text-white ">{currentCon?.participants?.[0]?.name.charAt(0)}</Text></View>
             </View>
 
             {/* قائمة الرسائل باستخدام FlatList */}

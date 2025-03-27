@@ -91,11 +91,12 @@ const SignUp = () => {
     <ScrollView className="flex-1 bg-white">
       <View className="flex-1 bg-white">
         <View className="relative w-full h-[250px]">
-          <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
-          <Text className="text-2xl text-black font-JakartaSemiBold absolute bottom-5 left-5">
-            أهلا وسهلا بك .انشئ حسابا 
-          </Text>
+          <Image source={images.auth} className="z-0 w-full h-[250px]" />
+          
         </View>
+        <Text className="text-2xl text-black  w-full  font-JakartaSemiBold mt-2">
+            أهلا وسهلا بك .انشئ حسابا 
+        </Text>
 
         {isError && <Text className="mx-5 text-red-500 font-JakartaBold text-md bg-gray-100 rounded-lg p-2">{error}</Text>}
         <View className="p-5">

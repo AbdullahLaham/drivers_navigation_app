@@ -1,15 +1,24 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from "react-native-swiper";
 import { onboarding } from '@/constants';
 import { router } from 'expo-router';
 import CustomButton from '@/components/CustomButton';
+import { useSelector } from 'react-redux';
 const Onboarding = () => {
   const swiperRef = useRef<Swiper>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const isLastSlide = activeIndex == onboarding.length - 1
+  const {currentUser: user, error, isError} = useSelector((state: any) => state?.auth);
 
+  
+ useEffect(() => {
+    if (user?.data?.token) {
+      router.push(`/(root)/(tabs)/home`);
+    }
+  }, []);
+ 
   return (
     <SafeAreaView className="flex h-full items-center justify-between bg-black">
 

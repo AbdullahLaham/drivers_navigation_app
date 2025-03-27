@@ -16,7 +16,7 @@ const TabIcon = ({
     className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-general-700" : ""}`}
   >
     <View
-      className={`rounded-full w-12 h-12 p-5 ml-3 items-center justify-center  ${focused ? "bg-general-400" : ""}`}
+      className={`rounded-full w-12 h-12 p-7 ml-3 items-center justify-center  ${focused ? "bg-general-400" : ""}`}
     >
       <Image
         source={source}
@@ -88,6 +88,16 @@ export default function Layout() {
           ),
         }}
       />
+      {/* <Tabs.Screen
+        name="reports"
+        options={{
+          title: "Reports",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon source={icons.reports} focused={focused} />
+          ),
+        }}
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{

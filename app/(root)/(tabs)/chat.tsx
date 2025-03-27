@@ -332,12 +332,18 @@ import Pusher from "pusher-js";
 import { runPusher } from "../_layout";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useConversationStore } from "@/lib/conversationStore";
+
 
 const ChatConversationsPage = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+
+
+  // addConversation
+const setConversation = useConversationStore((state) => state.setConversation);
 
     const { currentUser: user } = useSelector((state) => state?.auth);
 
@@ -379,11 +385,12 @@ const ChatConversationsPage = () => {
     const participant = item.participants[0]; // Assuming there is at least one participant
 
     return (
-      <TouchableOpacity style={styles.conversationItem} onPress={() => router.push(`/(root)/currentConversation/${item?.id}`)}>
+      <TouchableOpacity style={styles.conversationItem} onPress={() => {router.push(`/(root)/currentConversation/${item?.id}`); setConversation(item)}} className="relative">
         <Image source={{ uri: participant.profile_photo_url }} style={styles.avatar} />
         <View style={styles.conversationInfo}>
           <Text style={styles.name}>{participant.name}</Text>
-          <Text style={styles.lastMessage}>{lastMessage}</Text>
+          <Text style={styles.lastMessage}>{lastMessage} </Text>
+          <Text className="absolute  right-2 border border-gray-200 rounded-full p-1">{item?.new_messages > 0 ? item?.new_messages : ''}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -420,8 +427,13 @@ const ChatConversationsPage = () => {
             محادثاتك 
           </Text>
       <FlatList
-        data={conversations}
-        renderItem={renderConversation}
+        data={loading ? [...conversations, "loading"] : conversations} // Add "loading" as a placeholder
+        renderItem={(item) => item?.item == 'loading'  ? 
+        <View className="`p-4 bg-white m-2 rounded-lg shadow items-center`">
+          <ActivityIndicator size="large" color="gray" />
+          <Text className="`text-gray-500 mt-2`">Loading more...</Text>
+      </View> : 
+      renderConversation(item)}
         keyExtractor={(item) => item.id.toString()}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5} // Trigger next page load when 50% of the list is visible

@@ -20,6 +20,8 @@ import pin from "@/assets/icons/pin.png";
 import point from "@/assets/icons/point.png";
 import profile from "@/assets/icons/profile.png";
 import clock from "@/assets/icons/clock.png";
+import reports from "@/assets/icons/reports.png";
+
 import date from "@/assets/icons/date.png";
 import bell from '@/assets/icons/bell.png';
 import arrowRight from '@/assets/icons/rightArrow.png';
@@ -36,6 +38,7 @@ import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
 import signUpCar from "@/assets/images/signup-car.png";
+import auth from "@/assets/images/auth.jpg";
 
 export const images = {
     onboarding1,
@@ -46,6 +49,7 @@ export const images = {
     check,
     noResult,
     message,
+    auth,
 };
 
 export const icons = {
@@ -57,6 +61,7 @@ export const icons = {
     chat,
     arrowRight,
     checkmark,
+    reports,
     close,
     dollar,
     email,

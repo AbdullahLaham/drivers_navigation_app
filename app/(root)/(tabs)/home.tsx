@@ -30,6 +30,8 @@ export default function Page() {
   const [currentLocation, setCurrentLocation] = useState('');
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   const [startLocation, setStartLocation] = useState<any>(null);
 
@@ -174,6 +176,7 @@ export default function Page() {
 
   useEffect(() => {
     const requestLocation = async () => {
+      setIsLoading(true);
       try {
         console.log("طلب الإذن للموقع...");
 
@@ -233,6 +236,8 @@ export default function Page() {
       } catch (error) {
         console.error("Error fetching location:", error);
         Alert.alert("Error", "Failed to get location.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -318,7 +323,7 @@ export default function Page() {
 
   return (
     <SafeAreaView className="flex-1 relative ">
-      <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 right-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
+      <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 left-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
         <Image source={icons.bell} className="w-8 h-8" />
         <View className="w-2 h-2 rounded-full bg-red-500 absolute left-1 bottom-1"></View>
       </TouchableOpacity>
@@ -366,7 +371,13 @@ export default function Page() {
         )} */}
       </View>
 
-      <WebView originWhitelist={["*"]} source={{ html: generateMap() }} />
+      {isLoading ? (
+  <View className="flex-1 justify-center items-center">
+    <View className="w-full h-full bg-gray-300 rounded-lg" />
+  </View>
+) : (
+  <WebView originWhitelist={["*"]} source={{ html: generateMap() }} />
+)}
 
 
       {/* 📌  بيانات الرحلة */}
@@ -376,7 +387,7 @@ export default function Page() {
           <TouchableOpacity onPress={() => { setInpuStartLocation(JSON.stringify(startLocation)); console.log('') }}>
             <View className="bg-gray-300 ml-1  h-[3rem] w-[3rem] rounded-lg mt-1 flex items-center justify-center" >
               {/* <Target color="gray" size={25} className="text-red-500 bg-red-800" /> */}
-              <Image source={icons.pin} className={`w-5 h-6`} />
+              {isLoading ? <ActivityIndicator /> : <Image source={icons.pin} className={`w-5 h-6`} />}
             </View>
           </TouchableOpacity>
           <TextInput className="flex-1 rounded-lg mx-2 placeholder:text-gray-400 placeholder:text-end placeholder:text-lg my-1 border-none outline-none  bg-gray-200   h-[3rem]" placeholder="موقعي الحالي" value={inpuStartLocation} onChangeText={(text) => setInpuStartLocation(text)} />
