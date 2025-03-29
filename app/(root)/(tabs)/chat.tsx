@@ -323,7 +323,7 @@
 
 
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Text, TextInput, Image, TouchableOpacity, View,StyleSheet, KeyboardAvoidingView, Platform, Alert, Linking, ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -331,10 +331,10 @@ import * as Notifications from "expo-notifications";
 import Pusher from "pusher-js";
 import { runPusher } from "../_layout";
 import { FontAwesome } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useConversationStore } from "@/lib/conversationStore";
 
-
+let i = 0;
 const ChatConversationsPage = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -363,11 +363,37 @@ const setConversation = useConversationStore((state) => state.setConversation);
       });
 
       const newConversations = response.data.data;
-      setConversations((prev) => [...prev, ...newConversations]);
+
+      console.log(response.data?.data, 'daaaaaaaataaaaaaaaaaaa');
+      if (newConversations?.length > 0) {
+        setConversations((prev) => [...prev, ...newConversations]);
+        setHasMore(response.data.next_page_url !== null);
+        setPage((prev) => prev + 1);
+        return;
+      }
+
+
+      if (response?.data.data?.length == 0) {
+          const newConv = await axios.post(`https://ajwan.mahmoudalbatran.com/api/AddConversation`, {}, {
+            headers: { Authorization: `Bearer ${user?.data?.token}` },
+          });
+          console.log( 'no daat daaaaaaaataaaaaaaaaaaa', newConv?.data)
+
+
+          if (newConv?.data?.[0]?.id) {
+            setConversations(newConv?.data);
+            return;
+            // setConversation(newConv.data[0]);
+            // fetchMessages(newConv.data[0].id);
+            // fetchConversations();
+          }
+
+
+        } 
+      
 
       // Check if there are more conversations to load
-      setHasMore(response.data.next_page_url !== null);
-      setPage((prev) => prev + 1);
+  
     } catch (error) {
       console.error(error);
     } finally {
@@ -375,13 +401,23 @@ const setConversation = useConversationStore((state) => state.setConversation);
     }
   };
 
+
+// useFocusEffect(
+//     useCallback(() => {
+//       console.log('Page reloaded');
+//       fetchConversations();
+//       // You can also trigger state updates or re-fetch data here.
+//     }, [])
+//   );
+
   useEffect(() => {
+    setConversation(null)
     fetchConversations();
-  }, [page]);
+  }, []);
 
   // Render a single conversation item
   const renderConversation = ({ item }) => {
-    const lastMessage = item.last_message ? item?.last_message?.body : "No messages yet";
+    const lastMessage = item.last_message ? (item.last_message?.type !== 'attachment' ? item?.last_message?.body : "attachment") : "ليس لديك رسائل بعد" ;
     const participant = item.participants[0]; // Assuming there is at least one participant
 
     return (
@@ -390,7 +426,7 @@ const setConversation = useConversationStore((state) => state.setConversation);
         <View style={styles.conversationInfo}>
           <Text style={styles.name}>{participant.name}</Text>
           <Text style={styles.lastMessage}>{lastMessage} </Text>
-          <Text className="absolute  right-2 border border-gray-200 rounded-full p-1">{item?.new_messages > 0 ? item?.new_messages : ''}</Text>
+          {item?.new_messages > 0 ? <Text className="absolute  right-2 border border-gray-200 rounded-full p-1">{item?.new_messages}</Text> : ''}
         </View>
       </TouchableOpacity>
     );
@@ -434,7 +470,7 @@ const setConversation = useConversationStore((state) => state.setConversation);
           <Text className="`text-gray-500 mt-2`">Loading more...</Text>
       </View> : 
       renderConversation(item)}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => i++}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5} // Trigger next page load when 50% of the list is visible
         // ListFooterComponent={loading && <Text>Loading...</Text>}

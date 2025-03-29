@@ -86,7 +86,7 @@ const SignIn = () => {
 
         <View className="p-5">
           <InputField
-            label="Email"
+            label="الايميل"
             placeholder="Enter email"
             icon={icons.email}
             textContentType="emailAddress"
@@ -95,7 +95,7 @@ const SignIn = () => {
           />
 
           <InputField
-            label="Password"
+            label="الرقم السري"
             placeholder="Enter password"
             icon={icons.lock}
             secureTextEntry={true}

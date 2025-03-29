@@ -28,6 +28,7 @@ export default function Page() {
   const [inpuStartLocation, setInpuStartLocation] = useState('')
   const [inpuEndLocation, setInpuEndLocation] = useState('');
   const [currentLocation, setCurrentLocation] = useState('');
+  const [notificationCount, setNotificationCount] = useState(0)
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -244,35 +245,37 @@ export default function Page() {
     requestLocation();
   }, []);
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
+  useEffect(() => {
+    const checkAuth = async () => {
 
-  //     if (!user?.data?.token) {
-  //       router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
-  //       return;
-  //     }
+      if (!user?.data?.token) {
+        router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
+        return;
+      }
 
-  //     try {
-  //       const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
-  //         headers: {
-  //           Authorization: `Bearer ${user?.data?.token}`
-  //          }
-  //       })
+      try {
+        const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
+          headers: {
+            Authorization: `Bearer ${user?.data?.token}`
+           }
+        })
 
-  //       if (!res.data) {
-  //         dispatch(logout())
-  //         router.replace("/(auth)/sign-in");
+        if (!res.data) {
+          dispatch(logout())
+          router.replace("/(auth)/sign-in");
 
-  //       }
+        }
 
-  //     } catch (error) {
-  //       dispatch(logout());
-  //       router.replace("/(auth)/sign-in");
-  //     }
-  //   };
+      } catch (error) {
+        dispatch(logout());
+        router.replace("/(auth)/sign-in");
+      }
+    };
 
-  //   checkAuth();
-  // }, [user]);
+    checkAuth();
+  }, [user]);
+
+
 
   const generateMap = () => {
     const mapHtml = `
@@ -321,11 +324,30 @@ export default function Page() {
 
   usePusherNotifications();
 
+
+  useEffect(() => {
+    const getNotificationCount = async () => {
+      try {
+        const res  = await axios.get(`https://ajwan.mahmoudalbatran.com/api/notifications/count`, {
+          headers: { Authorization: `Bearer ${user?.data?.token}` },
+      });
+      setNotificationCount(res?.data);
+      console.log('ressssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss', res?.data)
+      }catch (error) {
+      console.log(error, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+  }
+    
+    
+  } 
+    getNotificationCount()
+
+  }, [])
+
   return (
     <SafeAreaView className="flex-1 relative ">
       <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 left-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
         <Image source={icons.bell} className="w-8 h-8" />
-        <View className="w-2 h-2 rounded-full bg-red-500 absolute left-1 bottom-1"></View>
+        <View className="w-5 h-5 rounded-full bg-red-500 absolute -left-1 -bottom-1 flex items-center justify-center  "><Text className="text-sm text-white">{notificationCount}</Text></View>
       </TouchableOpacity>
       {/* 🔍 مربع البحث */}
 

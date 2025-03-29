@@ -177,7 +177,7 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
   return (
     <SafeAreaView>
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
-        طلباتك {requests?.length}
+        طلباتك 
       </Text>
       <View className='flex flex-row-reverse items-center justify-between p-5'>
         <TouchableOpacity className={`px-10 py-3 rounded-lg ${state === 'rides' ? 'bg-blue-400 text-white' : ''}`} onPress={() => setState('rides')}>
@@ -306,7 +306,7 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
 
               onPress={filterReports}
             >
-              <Text className='text-white text-lg text-center'>عرض {filteredReports?.length}</Text>
+              <Text className='text-white text-lg text-center'>عرض</Text>
             </TouchableOpacity>
 
             {/* Report List */}

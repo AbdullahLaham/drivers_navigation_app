@@ -84,7 +84,7 @@
 
 
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { icons, images } from '@/constants';
 import { router, useFocusEffect } from 'expo-router';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
@@ -129,20 +129,27 @@ const Notification = () => {
     }
   }, [isNewNotification, queryClient]);
 
-  
-useFocusEffect(
+
+  useFocusEffect(
     useCallback(() => {
       if (isNewNotification) {
         queryClient.invalidateQueries(['notifications']);
       }
-      console.log('Page reloaded'); 
+      console.log('Page reloaded');
       // You can also trigger state updates or re-fetch data here.
     }, [])
   );
   const notifications = data?.pages.flatMap((page) => page.data) || [];
 
   const skeletonData = Array.from({ length: 5 }).map((_, index) => ({ id: index }));
-
+  useEffect(() => {
+    const read = async () => {
+      const res = await axios.put(`https://ajwan.mahmoudalbatran.com/api/notifications/read_at`, {}, {
+        headers: { Authorization: `Bearer ${user?.data?.token}` },
+      })
+    }
+    read();
+  }, [])
   return (
     <View>
       <View className="flex items-center justify-center p-3 bg-[#6d6969] relative">
@@ -181,12 +188,12 @@ useFocusEffect(
           data={notifications}
           keyExtractor={(item) => item?.id}
           renderItem={({ item }) => (
-            <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
-              
-              
+            <View className={`w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7 ${item?.read_at == null ? 'bg-gray-600' : ''}`}>
+
+
               <View className="flex items-center flex-row-reverse">
                 <Image source={icons.bell} className="w-6 h-6 ml-4" />
-                <Text className="text-gray-400 my-1 text-md">{item?.data?.body}</Text>
+                <Text className="text-gray-400 my-1 text-md">{item?.data?.body} </Text>
               </View>
 
               <View className="flex flex-row-reverse items-center justify-between w-full">

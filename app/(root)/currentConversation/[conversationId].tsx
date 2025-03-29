@@ -9,6 +9,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { icons } from "@/constants";
 import { useConversationStore } from "@/lib/conversationStore";
+import { Audio } from 'expo-av';
 
 
 const API_BASE = "https://ajwan.mahmoudalbatran.com/api";
@@ -29,6 +30,25 @@ const Chat = () => {
     const [userId, setUserId] = useState(user?.data?.client?.id || user?.data?.user?.id)
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false)
+    const [sound, setSound] = useState(null);
+
+    async function playSound() {
+      const { sound } = await Audio.Sound.createAsync(
+        require('@/assets/audio/new.aac'), // ضع المسار الصحيح للملف الصوتي
+        { shouldPlay: true }
+      );
+      setSound(sound);
+      await sound.playAsync();
+    }
+  
+    useEffect(() => {
+      return sound
+        ? () => {
+            sound.unloadAsync();
+          }
+        : undefined;
+    }, [sound]);
+
 
 
     const { conversationId } = useLocalSearchParams();
@@ -108,7 +128,7 @@ const Chat = () => {
             return (
                 <TouchableOpacity
                     className="mb-3 p-3 rounded-lg bg-gray-700 self-start flex-row items-center"
-                    onPress={() => Linking.openURL(`${API_BASE}/${item.body.file_path}`)}
+                    onPress={() => Linking.openURL(`https://ajwan.mahmoudalbatran.com/storage/${item.body.file_path}`)}
                 >
                     <FontAwesome name="file" size={24} color="white" className="mr-2" />
                     <Text className="text-white">{item.body.file_name}</Text>
@@ -169,21 +189,31 @@ const Chat = () => {
 
     // 🔹 الاستماع للرسائل الجديدة من `Pusher`
     useEffect(() => {
-
+        
         try {
             const pusher = runPusher(user);
             // الاشتراك في القناة الخاصة بالمستخدم
             const channel = pusher.subscribe(`presence-Messenger.${userId}`);
+            
             const handleNewMessage = (event: any) => {
-                console.log("📩 رسالة جديدة:", event);
+                // console.log("📩 رسالة جديدة:", event);
                 const newMessage: any = event?.message;
-                console.log("📩 رسالة جديدة:", newMessage);
+                // console.log("📩 رسالة جديدة:", newMessage);
         
+                
+
                 setMessages((prev) => [newMessage, ...prev]);
                 sendPushNotification(newMessage?.user?.name, newMessage?.body);
+                
         
-                if (newMessage?.conversation_id === conversationId) {
+                if (newMessage?.conversation_id !== conversationId) {
                     // تنفيذ أي عمليات إضافية هنا
+                    // sendPushNotification(newMessage?.user?.name, newMessage?.body);
+                    playSound();
+                    
+                    // playSound();
+                } else {
+                    
                 }
             };
             // استقبال الرسائل الجديدة من الحدث "new-message"
@@ -204,11 +234,27 @@ const Chat = () => {
             // تنظيف الاشتراك عند التفكيك
             return () => {
                 channel.unbind_all();
+                // pusher.unsubscribe(`presence-Messenger.${userId}`);
             };
         } catch (error) {
             console.log("Error initializing Pusher:", error);
         }
-    }, [conversationId]);
+    }, [user, conversationId]);
+    const read = async () => {
+        try {
+            const res = await axios.put(`https://ajwan.mahmoudalbatran.com/api/conversations/${conversationId}/read`,{}, {
+                headers: { Authorization: `Bearer ${user?.data?.token}` },
+            });
+            console.log('ressssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss', res?.data)
+    
+        } catch (error) {
+            console.log(error, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+        }
+    }
+    useEffect(() => {
+        
+        read()
+    }, [conversationId])
 
     // 🔹 دالة إرسال الإشعار عند استقبال رسالة جديدة
     const sendPushNotification = async (senderName, messageBody) => {
@@ -225,6 +271,7 @@ const Chat = () => {
     if (fetching) {
         return skeletonMessages()
     }
+
     return (
         <View className="flex-1 bg-gray-900">
             {/* العنوان */}

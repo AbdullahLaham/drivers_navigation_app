@@ -101,14 +101,14 @@ const SignUp = () => {
         {isError && <Text className="mx-5 text-red-500 font-JakartaBold text-md bg-gray-100 rounded-lg p-2">{error}</Text>}
         <View className="p-5">
           <InputField
-            label="Name"
+            label="الاسم"
             placeholder="Enter name"
             icon={icons.person}
             value={form.name}
             onChangeText={(value) => setForm({ ...form, name: value })}
           />
           <InputField
-            label="Email"
+            label="الايميل"
             placeholder="Enter email"
             icon={icons.email}
             textContentType="emailAddress"
@@ -116,7 +116,7 @@ const SignUp = () => {
             onChangeText={(value) => setForm({ ...form, email: value })}
           />
           <InputField
-            label="Phone"
+            label="رقم الهاتف"
             placeholder="Phone Number"
             // textContentType="Number"
             icon={icons.phone}
@@ -124,7 +124,7 @@ const SignUp = () => {
             onChangeText={(value) => setForm({ ...form, phone_number: value })}
           />
           <InputField
-            label="Password"
+            label="الرقم السري"
             placeholder="Enter password"
             icon={icons.lock}
             secureTextEntry={true}

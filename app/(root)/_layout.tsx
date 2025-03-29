@@ -117,7 +117,13 @@ const Layout = () => {
           title,
           body,
           sound: true,
-          data: {image: 'https://your-image-url.com/image.jpg' }
+          data: {image: 'https://your-image-url.com/image.jpg' },
+          attachments: [
+            {
+              uri: "https://picsum.photos/200/300", // URL of the image
+              type: "image",
+            },
+          ],
         },
         trigger: null, // يُعرض الإشعار فورًا
       });
