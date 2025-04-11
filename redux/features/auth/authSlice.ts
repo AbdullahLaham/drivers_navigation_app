@@ -6,8 +6,10 @@ import API from '../MainApi';
 
 type stateType = {
     currentUser: any,
+    updatedUser: any,
     isNewRide: Boolean,
     isNewNotification: Boolean,
+    isNewMessageNotification: Boolean,
     listingAddedToWishlist: any,
     listingDeletedFromWishlist: any,
     wishlist: any,
@@ -30,8 +32,10 @@ const user = getData('user');
 
 const initialState: stateType = {
   currentUser:  user,
+  updatedUser: {},
   isNewRide: false,
   isNewNotification: false,
+  isNewMessageNotification: false,
   listingAddedToWishlist: {},
   listingDeletedFromWishlist: {},
   wishlist: [],
@@ -56,6 +60,17 @@ export const login = createAsyncThunk('auth/login', async (user: any, thunkAPI) 
 });
 
 
+export const updateUser = createAsyncThunk('auth/update-auth', async (user: any, thunkAPI) => {
+    try {
+      //   return await authService.login(user);
+    //   const res =  await API.post('/auth/login', user);
+  return user;
+        
+    } catch (error: any) {
+        return thunkAPI.rejectWithValue(error?.response?.data?.message! || "حدث خطأ أثناء التسجيل");
+    }
+  
+  });
 
 export const verify = createAsyncThunk('auth/login/verify', async (user: any, thunkAPI) => {
     try {
@@ -90,6 +105,19 @@ export const register = createAsyncThunk('auth/register', async (user: any, thun
 
 
 export const newNotification = createAsyncThunk('auth/new-notification', async (thunkAPI) => {
+    try {
+  
+        // return await authService.logout();
+        console.log('hello');
+        
+    } catch (error) {
+      throw new Error("something went wrong");
+    }
+  
+  })
+
+
+  export const newNotificationMessage = createAsyncThunk('auth/new-notification-message', async (thunkAPI) => {
     try {
   
         // return await authService.logout();
@@ -168,6 +196,44 @@ export const authSlice = createSlice({
     })
 
     .addCase(login.rejected,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = true;
+        state.isSuccess = false;
+        state.currentUser = null;
+        state.error = action.payload;
+        if (state?.isError) {
+            toast.error("something went wrong");
+        }
+        // state.message = action.error;
+    })
+
+
+
+
+
+
+
+    .addCase(updateUser.pending,(state) => {state.isLoading = true }  )
+    .addCase(updateUser.fulfilled,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = false ;
+        state.isSuccess = true;
+        state.updatedUser = action?.payload;
+        if (state?.currentUser?.data?.client) {
+            state.currentUser.data.client = action?.payload;
+
+
+        }
+        if (state?.currentUser?.data?.user) {
+            state.currentUser.data.user = action?.payload;
+        }
+        state.error = '';
+        if (state?.isSuccess) {
+            toast.success("user entered successfully");
+        }
+    })
+
+    .addCase(updateUser.rejected,(state, action: PayloadAction<any>) => {
         state.isLoading = false ;
         state.isError = true;
         state.isSuccess = false;
@@ -283,6 +349,34 @@ export const authSlice = createSlice({
     })
 
 
+
+    .addCase(newNotificationMessage.pending,(state) => {state.isLoading = true }  )
+    .addCase(newNotificationMessage.fulfilled,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = false ;
+        state.isSuccess = true;
+        state.isNewMessageNotification = true;
+        state.error  = '';
+        if (state?.isSuccess) {
+            // toast.success("user created successfully, please Login");
+        }
+    })
+    .addCase(newNotificationMessage.rejected,(state, action: PayloadAction<any>) => {
+        state.isLoading = false ;
+        state.isError = true;
+        state.isSuccess = false;
+        state.isNewMessageNotification = false;
+        state.error = action.payload;
+        if (state?.isError) {
+            toast.error("something went wrong");
+        }
+    })
+
+
+
+
+    
+
     .addCase(logout.pending,(state) => {state.isLoading = true }  )
     
     
@@ -291,6 +385,7 @@ export const authSlice = createSlice({
         state.isError = false ;
         state.isSuccess = true;
         state.currentUser = null;
+        state.updatedUser = null;
     })
 
     .addCase(logout.rejected,(state, action: PayloadAction<any>) => {

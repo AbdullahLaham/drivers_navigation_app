@@ -138,3 +138,11 @@
 
 
 
+
+  //   "expo-splash-screen",
+    //   {
+    //     "image": "./assets/images/splash.jpeg",
+    //     "resizeMode": "cover",
+    //     "backgroundColor": "#ffffff"
+    //   }
+    // ],

@@ -1,4 +1,4 @@
-import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { format, formatDistanceToNow, parseISO, startOfDay } from "date-fns";
 import axios from 'axios';
@@ -7,68 +7,84 @@ import { icons, images } from '@/constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { DatePickerModal } from "react-native-paper-dates";
+import { LocaleConfig } from 'react-native-calendars'; // This can help with month/year rendering issues
 import { Card } from "react-native-paper";
 import { useFocusEffect } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
+import { useConversationStore } from '@/lib/conversationStore';
+// import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const reports = [
-  {
-    id: "1",
-    date: "2025-03-13",
-    employees: ["اسمهان", "رحمة", "سهير"],
-    description: "من البريج نقطتين الى الزوايدة الشاليهات ثم دير البلح صحة المرأة",
-    team: "6",
-  },
-  {
-    id: "2",
-    date: "2025-03-10",
-    employees: ["بيسان"],
-    description: "من دير البلح أبو صفر الى الأقصى",
-    team: "9",
-  },
-  {
-    id: "3",
-    date: "2025-03-09",
-    employees: ["بتينة"],
-    description: "من المغازي الى دير البلح مقر بنقو",
-    team: "3",
-  },
-];
+import DatePicker from 'react-native-date-picker';
 
 const Rides = () => {
   const [state, setState] = useState("rides");
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingFilter, setLoadingFilter] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [totalPrice, setTotalPrice] = useState(0);
 
+  const [fromDate, setFromDate] = useState<any>();
+  const [toDate, setToDate] = useState<any>();
 
-  const [fromDate, setFromDate] = useState(new Date("2025-03-20T00:00:00.000Z"));
-  const [toDate, setToDate] = useState(new Date("2025-03-27T00:00:00.000Z"));
+  const setStartDate = useConversationStore((state: any) => state.setStartDate);
+  const setEndDate = useConversationStore((state: any) => state.setEndDate);
+
+  const filterReportsStartDate = useConversationStore((state: any) => state.filterReportsStartDate);
+  const filterReportsEndDate = useConversationStore((state: any) => state.filterReportsEndDate);
+
 
 
   const [visibleFrom, setVisibleFrom] = useState(false);
   const [visibleTo, setVisibleTo] = useState(false);
   const [filteredReports, setFilteredReports] = useState([]);
-  console.log(fromDate, toDate, 'ttttttttttttt')
+  console.log(filterReportsStartDate, filterReportsEndDate, 'ttttttttttttt');
+
+
+
+
   const filterReports = async () => {
-    console.log('heeeeeeeeeellllllllloooooooooooo')
-    let start  =  format(fromDate, "yyyy-MM-dd")
-    let end = format(toDate, "yyyy-MM-dd")
-    // const startOfDayDate1 = startOfDay(isoStart);
-    // const startOfDayDate2 = startOfDay(isoEnd);
-    // let startDate= format(startOfDayDate1, "yyyy-MM-dd'T'HH:mm:ss");
+    let start = format(filterReportsStartDate, "yyyy-MM-dd")
+    let end = format(filterReportsEndDate, "yyyy-MM-dd");
+    setLoadingFilter(true);
 
-    // let endDate= format(startOfDayDate2, "yyyy-MM-dd'T'HH:mm:ss");
+    console.log(`https://ajwan.mahmoudalbatran.com/api/filter?start_at=${start}&end_at=${end}`, 'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+    // console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
+    try {
+      const res = await axios.get(`https://ajwan.mahmoudalbatran.com/api/filter?start_at=${start}&end_at=${end}`, {
+        headers: { Authorization: `Bearer ${user?.data?.token}` }
+      })
+      // console.log(res?.data, 'ffffffffuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
 
-console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
-    const res = await axios.get(`https://ajwan.mahmoudalbatran.com/api/filter?start_at=${start}&end_at=${end}`, {
-      headers: { Authorization: `Bearer ${user?.data?.token}` }
-    })
-    console.log(res?.data, 'ffffffffuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu');
-    setFilteredReports(res?.data)
-    // setFilteredReports(filtered);
+      if (res?.data) {
+        console.log(res?.data,'dataaaaaaaaaaaaaa')
+        setFilteredReports(res?.data);
+        const total = res?.data.reduce((acc, item) => {
+          return acc + (parseFloat(item?.price) || 0);
+        }, 0);
+        setTotalPrice(total);
+      }
+
+
+
+    } catch (error) {
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
+
+      if (!error.response) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
+
+    } finally {
+      setLoadingFilter(false);
+
+    }
   };
 
   const lastDate = requests?.length ? format(requests?.[requests?.length - 1]?.['created_at'], "MM/yyyy") : '02/2025';
@@ -115,6 +131,10 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
       setPage(nextPage);
     } catch (error) {
       console.error("Error fetching orders", error);
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -126,19 +146,30 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
     useCallback(() => {
       console.log('Page reloaded');
       getOrders();
+      filterReports();
       // You can also trigger state updates or re-fetch data here.
     }, [])
   );
 
-
+  const calculateTotalPrice  = () => {
+    // for (let item of filteredReports) { 
+    //   if (item?.price) 
+    //   {setTotalPrice((prev) => parseFloat(prev) + parseFloat(item.price));}
+    // }
+    const total = filteredReports.reduce((acc, item) => {
+      return acc + (parseFloat(item?.price) || 0);
+    }, 0);
+    setTotalPrice(total);
+  }
 
   useEffect(() => {
     getOrders();
+    calculateTotalPrice()
   }, [isNewRide]);
 
   useEffect(() => {
     filterReports();
-  }, [fromDate, toDate]);
+  }, [filterReportsStartDate, filterReportsEndDate]);
 
   const loadMoreOrders = () => {
     if (hasMore && !loadingMore) {
@@ -152,19 +183,21 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
 
   const renderSkeleton = () => (
     <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
-      <View className='flex items-center flex-row-reverse'>
-        <View className='w-6 h-6 bg-gray-300 rounded-full ml-4' />
+      <View className='flex items-center flex-row'>
+
         <View className='w-40 h-4 bg-gray-300 rounded-md' />
-      </View>
-      <View className='flex items-center flex-row-reverse mt-2'>
         <View className='w-6 h-6 bg-gray-300 rounded-full ml-4' />
-        <View className='w-40 h-4 bg-gray-300 rounded-md' />
       </View>
-      <View className='flex flex-row-reverse items-center justify-between w-full mt-2'>
+      <View className='flex items-center flex-row mt-2'>
+
+        <View className='w-40 h-4 bg-gray-300 rounded-md' />
+        <View className='w-6 h-6 bg-gray-300 rounded-full ml-4' />
+      </View>
+      <View className='flex flex-row items-center justify-between w-full mt-2'>
         <View className='w-20 h-4 bg-gray-300 rounded-md' />
         <View className='w-16 h-4 bg-gray-300 rounded-md' />
       </View>
-      <View className='flex flex-row-reverse items-center justify-between w-full mt-2'>
+      <View className='flex flex-row items-center justify-between w-full mt-2'>
         <View className='w-12 h-6 bg-gray-300 rounded-md' />
         <View className='w-24 h-6 bg-blue-300 rounded-md' />
       </View>
@@ -172,6 +205,57 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
   );
 
   // for reports page 
+
+  useEffect(() => {
+    const checkAuth = async () => {
+
+      if (!user?.data?.token) {
+        router.replace("/(auth)/sign-in"); // توجيه المستخدم لصفحة تسجيل الدخول إذا لم يوجد توكن
+        return;
+      }
+
+      try {
+        const res = await axios.get('https://ajwan.mahmoudalbatran.com/api/auth/tokens', {
+          headers: {
+            Authorization: `Bearer ${user?.data?.token}`
+           }
+        })
+
+        if (!res.data) {
+          dispatch(logout())
+          router.replace("/(auth)/sign-in");
+
+        }
+
+      } catch (error) {
+        // dispatch(logout());
+        console.log(error, 'eeeeeeeerrrrrrrrorr');
+
+        if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+          Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+          return; // لا نسجل خروج المستخدم
+        }
+
+        if (!error.response) {
+          Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+          return; // لا نسجل خروج المستخدم
+        }
+
+
+         // التحقق مما إذا كان الخطأ بسبب انتهاء صلاحية التوكن أو خطأ في المصادقة
+         if (error.response.status === 401 || error.response.status === 403) {
+          dispatch(logout());
+          router.replace("/(auth)/sign-in");
+        } else {
+          Alert.alert("حدث خطأ", "يرجى المحاولة مرة أخرى.");
+        }
+        // router.replace("/(auth)/sign-in");
+      }
+    };
+
+    checkAuth();
+  }, [user]);
+
 
 
   return (
@@ -191,39 +275,42 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
       {
         state == 'rides' ? (
           <View>
-            <Text className='font-bold text-lg text-gray-600 my-1 w-full flex flex-row-reverse mb-5' style={{ textAlign: "right", writingDirection: "rtl" }}> طلباتي مؤخرا{""}</Text>
+            <Text className='font-bold text-lg text-gray-600 my-1 w-full flex flex-row mb-5 mx-5'> طلباتي مؤخرا{""}</Text>
 
             <FlatList
               data={loading ? Array(5).fill({}) : requests}
               keyExtractor={(item, index) => loading ? `skeleton-${index}` : item?.id}
               renderItem={({ item }) => loading ? renderSkeleton() : (
-                <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
-                  <View className='flex items-center flex-row-reverse'>
-                    <Image source={icons.point} className='w-6 h-6 ml-4' />
+                <View className='w-[100%] flex flex-col  justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.point} className='w-6 h-6 ml-3' />
                     <Text className='text-gray-400 my-1 text-md'>{item?.from}</Text>
                   </View>
-                  <View className='flex items-center flex-row-reverse'>
-                    <Image source={icons.to} className='w-6 h-6 ml-4' />
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.to} className='w-6 h-6 ml-3' />
                     <Text className='text-gray-400 my-1 text-md'>{item?.to}</Text>
                   </View>
-                  <View className='flex flex-row-reverse items-center justify-between w-full'>
-                    <View className='flex flex-row items-center'>
+                  <View className='flex flex-row items-center justify-between w-full'>
+                    <View className='flex flex-row-reverse items-center gap-1'>
                       <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)}</Text>
                       <Image source={icons.clock} className='w-6 h-6 ml-3' />
                     </View>
-                    <View className='flex flex-row items-center'>
+                    <View className='flex flex-row-reverse items-center gap-1'>
                       <Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)}</Text>
                       <Image source={icons.date} className='w-6 h-6 ml-1' />
                     </View>
                   </View>
-                  <View className='flex flex-row-reverse items-center justify-between w-full'>
-                    <View className='flex flex-row items-center'><Text className='text-gray-500 text-md'>{item?.price || 5}</Text><Text className='text-lg font-bold text-black'>₪</Text></View>
+                  <View className='flex flex-row items-center justify-between w-full px-4'>
+                    <View className='flex flex-row items-center gap-2'>
+                      <Text className='text-lg font-bold text-black'>₪</Text>
+                      <Text className='text-gray-500 text-md'>{item?.price || "لم يتم تحديد السعر "}</Text>
+                    </View>
 
                     <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
                       <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
                     </TouchableOpacity>
                   </View>
-                  <View><Text>{formatDistanceToNow(new Date(item?.created_at), { addSuffix: true })}</Text></View>
+                  {/* <View><Text>{formatDistanceToNow(new Date(item?.created_at), { addSuffix: true })}</Text></View> */}
                 </View>
               )}
               onEndReached={loadMoreOrders}
@@ -244,8 +331,8 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
             </Text>
 
             {/* Date pickers */}
-            <View className='flex flex-row-reverse my-[1rem]'>
-              <Text className='mb-[2rem] text-black mt-5 px-2 font-semibold text-md '>من</Text>
+            <View className='flex flex-row my-[1rem]'>
+            <Text className='mb-[2rem] text-black mt-5 px-2 font-semibold text-md '>من</Text>
               <TouchableOpacity className='h-[4rem]'
                 style={{
                   padding: 12,
@@ -258,8 +345,10 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
                 }}
                 onPress={() => setVisibleFrom(true)}
               >
-                <Text className='font-bold text-xl '>{format(fromDate, "yyyy-MM-dd")}</Text>
+                <Text className='font-bold text-xl '>  {format(filterReportsStartDate, "yyyy-MM-dd")}</Text>
               </TouchableOpacity>
+              
+
               <Text className='mb-[2rem] text-black mt-5 px-2 font-semibold text-md '>إلى</Text>
               <TouchableOpacity
                 className='h-[4rem] '
@@ -274,68 +363,155 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
                 }}
                 onPress={() => setVisibleTo(true)}
               >
-                <Text className='font-bold text-xl '>{format(toDate, "yyyy-MM-dd")}</Text>
+                <Text className='font-bold text-xl '>{format(filterReportsEndDate, "yyyy-MM-dd")}</Text>
               </TouchableOpacity>
+
+              
+
             </View>
 
             {/* DatePickerModal for 'From' date */}
-            <DatePickerModal
+            {/* <DatePickerModal
               mode="single"
               visible={visibleFrom}
-              date={fromDate}
+              date={filterReportsStartDate}
               onDismiss={() => setVisibleFrom(false)}
               onConfirm={(date) => {
-                setFromDate(date?.date);
+                setStartDate(date?.date);
                 setVisibleFrom(false);
               }}
-            />
+            /> */}
 
             {/* DatePickerModal for 'To' date */}
-            <DatePickerModal
+            {/* <DatePickerModal
               mode="single"
               visible={visibleTo}
-              date={toDate}
+              date={filterReportsEndDate}
               onDismiss={() => setVisibleTo(false)}
               onConfirm={(date) => {
-                setToDate(date?.date);
+                setEndDate(date?.date);
+                setVisibleTo(false);
+              }}
+            /> */}
+
+
+
+
+             {/* DatePickerModal for 'From' date */}
+            {/* <DatePicker
+              modal
+              mode="date"
+              open={visibleFrom}
+              date={filterReportsStartDate}
+              onCancel={() => setVisibleFrom(false)}
+              onConfirm={(date) => {
+                setStartDate(date?.date);
+                setVisibleFrom(false);
+              }}
+            /> */}
+
+            {/* DatePickerModal for 'To' date */}
+            {/* <DatePicker
+              modal
+              mode="date"
+              open={visibleTo}
+              date={filterReportsEndDate}
+              onCancel={() => setVisibleTo(false)}
+              onConfirm={(date) => {
+                setEndDate(date?.date);
                 setVisibleTo(false);
               }}
             />
+             */}
+
+<DateTimePickerModal
+        isVisible={visibleFrom}
+        date={filterReportsStartDate}
+        mode="date"
+        onConfirm={(selectedDate) => {
+          console.log(selectedDate)
+          setStartDate(selectedDate);
+          setVisibleFrom(false);
+        }}
+        onCancel={() => setVisibleFrom(false)}
+      />
+      <DateTimePickerModal
+        isVisible={visibleTo}
+        date={filterReportsEndDate}
+        mode="date"
+        onConfirm={(selectedDate) => {
+          setEndDate(selectedDate);
+                setVisibleTo(false);
+        }}
+        onCancel={() => setVisibleTo(false)}
+      />
+
+{/* {visibleFrom && (
+        <DateTimePicker
+          value={filterReportsStartDate} // Set the initial date
+          mode="date" // Show date picker mode (can also be "time" or "datetime")
+          display="default" // Default display style
+          onChange={(e, date) => {
+            console.log(date, 'dddddddddddddddddddddddddd')
+            // setStartDate(date?.date);
+            //     setVisibleFrom(false);
+          }} // Handle date change
+        />
+      )} */}
+
+{/* {visibleFrom && (
+        <DateTimePicker
+          value={filterReportsEndDate} // Set the initial date
+          mode="date" // Show date picker mode (can also be "time" or "datetime")
+          display="default" // Default display style
+          onChange={(e, date) => {
+            console.log(date, 'dddddddddddddddddddddddddd')
+            // setStartDate(date?.date);
+            //     setVisibleFrom(false);
+          }} // Handle date change
+        />
+      )} */}
+
             {/* Search Button */}
-            <TouchableOpacity className='w-full py-2 px-3 bg-black rounded-md mt-3 h-[3rem] -mt-2'
+            <TouchableOpacity className='w-full py-2 px-3 bg-black rounded-md h-[3rem] -mt-2'
 
               onPress={filterReports}
             >
               <Text className='text-white text-lg text-center'>عرض</Text>
             </TouchableOpacity>
 
+            {filteredReports?.length > 0 ? (<View className='flex flex-row items-center gap-2 my-2'>
+              <Text className='text-lg font-semibold text-gray-600'>السعر الكلي لطلباتك خلال هذه الفترة : </Text>
+              <Text className='text-lg font-bold'>{totalPrice} ₪</Text>
+            </View>) : (<View></View>)}
+
             {/* Report List */}
 
-            <FlatList
+            {/* <FlatList
               data={loading ? Array(5).fill({}) : filteredReports}
               keyExtractor={(item, index) => loading ? `skeleton-${index}` : item?.id}
-              renderItem={({ item }) => loading ? renderSkeleton() : (
-                <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
-                  <View className='flex items-center flex-row-reverse'>
-                    <Image source={icons.point} className='w-6 h-6 ml-4' />
+              renderItem={({ item }) => loadingFilter ? renderSkeleton() : (
+                <View className='w-[100%] flex flex-col  justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.point} className='w-6 h-6 ml-3' />
                     <Text className='text-gray-400 my-1 text-md'>{item?.from}</Text>
                   </View>
-                  <View className='flex items-center flex-row-reverse'>
-                    <Image source={icons.to} className='w-6 h-6 ml-4' />
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.to} className='w-6 h-6 ml-3' />
                     <Text className='text-gray-400 my-1 text-md'>{item?.to}</Text>
                   </View>
-                  <View className='flex flex-row-reverse items-center justify-between w-full'>
-                    <View className='flex flex-row items-center'>
+                  <View className='flex flex-row items-center justify-between w-full'>
+                    <View className='flex flex-row-reverse items-center gap-1'>
                       <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)}</Text>
                       <Image source={icons.clock} className='w-6 h-6 ml-3' />
                     </View>
-                    <View className='flex flex-row items-center'>
+                    <View className='flex flex-row-reverse items-center gap-1'>
                       <Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)}</Text>
                       <Image source={icons.date} className='w-6 h-6 ml-1' />
                     </View>
                   </View>
-                  <View className='flex flex-row-reverse items-center justify-between w-full'>
-                    <View className='flex flex-row items-center'><Text className='text-gray-500 text-md'>{item?.price || 5}</Text><Text className='text-lg font-bold text-black'>₪</Text></View>
+                  <View className='flex flex-row items-center justify-between w-full'>
+                    <Text className='text-lg font-bold text-black'>₪</Text> <View className='flex flex-row items-center gap-2'> <Text className='text-gray-500 text-md'>{item?.price || "لم يتم تحديد السعر"}</Text></View>
 
                     <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
                       <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
@@ -346,27 +522,59 @@ console.log('ssssssssssssss', start, end, 'eeeeeeeeeeeeeeeeeeeeeeeeeee')
               )}
               onEndReached={loadMoreOrders}
               onEndReachedThreshold={0.5}
-
-
-              ListEmptyComponent={() => (
-                <View className="flex flex-col items-center justify-center flex-1">
-
-                  <>
-                    <Image
-                      source={images.noResult}
-                      className="w-40 h-40"
-                      alt="No recent rides found"
-                      resizeMode="contain"
-                    />
-                    <Text className="text-sm ">لا يوجد طلبات لعرضها</Text>
-                  </>
-
-                </View>
-              )}
               ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="blue" /> : (
-                <View className='h-[50rem] p-10 bg-gray-50' >
+                <View className='h-[28rem]' style={{ padding: 10, backgroundColor: 'white' }}>
                 </View>
               )}
+
+
+            />
+             */}
+
+             
+            <FlatList
+              data={loadingFilter ? Array(5).fill({}) : filteredReports}
+              keyExtractor={(item, index) => loadingFilter ? `skeleton-${index}` : item?.id}
+              renderItem={({ item }) => loadingFilter ? renderSkeleton() : (
+                <View className='w-[100%] flex flex-col  justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.point} className='w-6 h-6 ml-3' />
+                    <Text className='text-gray-400 my-1 text-md'>{item?.from}</Text>
+                  </View>
+                  <View className='flex items-center flex-row gap-1'>
+                    <Image source={icons.to} className='w-6 h-6 ml-3' />
+                    <Text className='text-gray-400 my-1 text-md'>{item?.to}</Text>
+                  </View>
+                  <View className='flex flex-row items-center justify-between w-full'>
+                    <View className='flex flex-row-reverse items-center gap-1'>
+                      <Text className='text-gray-500 text-sm font-semibold'>{convertToDate(item?.created_at)}</Text>
+                      <Image source={icons.clock} className='w-6 h-6 ml-3' />
+                    </View>
+                    <View className='flex flex-row-reverse items-center gap-1'>
+                      <Text className='text-gray-500 text-sm font-semibold'>{convertToTime(item?.created_at)}</Text>
+                      <Image source={icons.date} className='w-6 h-6 ml-1' />
+                    </View>
+                  </View>
+                  <View className='flex flex-row items-center justify-between w-full px-4'>
+                    <View className='flex flex-row items-center gap-2'>
+                      <Text className='text-lg font-bold text-black'>₪</Text>
+                      <Text className='text-gray-500 text-md'>{item?.price || "لم يتم تحديد السعر "}</Text>
+                    </View>
+
+                    <TouchableOpacity onPress={() => router.push(`/(root)/currentRide/${item?.id}`)}>
+                      <Text className='text-blue-500 font-semibold text-lg'>عرض التفاصيل</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+              onEndReached={loadMoreOrders}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="blue" /> : (
+                <View className='h-[58rem]' style={{ padding: 10, backgroundColor: 'white' }}>
+                </View>
+              )}
+
+
             />
 
           </View>

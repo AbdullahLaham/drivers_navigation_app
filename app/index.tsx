@@ -1,14 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Redirect } from 'expo-router'
-import enableRTL from "@/utils/rtlSetup";
-import { Platform } from "react-native";
-import * as Notifications from "expo-notifications";
-import Pusher from "pusher-js";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react'
+import { Redirect, router } from 'expo-router'
+
 import { I18nManager } from 'react-native';
 import * as Localization from 'expo-localization';
+
+
 // import * as Updates from 'expo-updates';
 
 
@@ -18,11 +15,26 @@ I18nManager.allowRTL(true); // السماح بالتبديل إلى RTL إذا �
 const isRTL = Localization.isRTL; // التحقق مما إذا كانت اللغة الحالية RTL
 
 const Home = () => {
+  const [mounted, setMounted]  = useState(false);
   //   useEffect(() => {
   //   enableRTL();
   // }, []);
 
   // return <Redirect href="/(auth)/welcome" />
+
+  // if (!mounted) {
+  //   return 
+  // }
+
+  
+  // useEffect(() => {
+  //   setMounted(true)
+  //   if (mounted) {
+  //     return router.replace("/(auth)/welcome");
+  //   }
+  // }, [])
+
+
   return <Redirect href="/(auth)/welcome" />
   
   // return <Redirect href="/(root)/(tabs)/home" />
@@ -31,6 +43,4 @@ const Home = () => {
 export default Home
 
 const styles = StyleSheet.create({});
-
-
 

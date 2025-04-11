@@ -1,35 +1,41 @@
 import { useState } from "react";
-import { 
-  Modal, 
-  Image, 
-  ScrollView, 
-  Text, 
-  View, 
-  Alert, 
-  TouchableOpacity, 
-  StyleSheet, 
-  TextInput, 
-  ActivityIndicator
+import {
+  Modal,
+  Image,
+  ScrollView,
+  Text,
+  View,
+  Alert,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+  Platform
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InputField from "@/components/InputField";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/redux/store";
-import { logout } from "@/redux/features/auth/authSlice";
+import { logout, updateUser } from "@/redux/features/auth/authSlice";
 import CustomButton from "@/components/CustomButton";
 import { router } from "expo-router";
 import axios from "axios";
+import mime from "mime";
+
+
 
 const Profile = () => {
-  const { currentUser: user } = useSelector((state: any) => state?.auth);
+  const { currentUser: user, updatedUser } = useSelector((state: any) => state?.auth);
   const dispatch = useAppDispatch();
+  console.log('pppppppppppppppppppp',user?.data?.client?.profile_photo_url, user?.data?.user?.profile_photo_url)
 
   // State for profile image and modals
   const [profileImage, setProfileImage] = useState(
-    user?.data?.client?.profile_photo_url || user?.data?.user?.profile_photo_url
+    updatedUser?.profile_photo_url || user?.data?.client?.profile_photo_url || user?.data?.user?.profile_photo_url
   );
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [personalDataModalVisible, setPersonalDataModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
 
   // States for password change
@@ -41,7 +47,7 @@ const Profile = () => {
   const onLogout = () => {
     dispatch(logout());
     router.replace("/(auth)/sign-in");
-    
+
   };
 
   // Function to pick a new image from the library
@@ -53,34 +59,184 @@ const Profile = () => {
       quality: 1,
     });
 
+
+
     if (!result.canceled) {
       const uri = result.assets[0].uri;
       setProfileImage(uri);
       uploadProfileImage(uri);
     }
+
+
   };
 
   // Dummy function to simulate uploading a profile image
+  // const uploadProfileImage = async (imageUri: string) => {
+  //   setLoading(true)
+  //   try {
+  //   //   const fileType = mime.getType(imageUri) || "image/jpeg";
+  //   // const fileExtension = fileType.split("/")[1]; // استخراج الامتداد
+
+  //   // const imageName = imageUri.split('/').pop(); // استخراج اسم الصورة
+
+  //   // const formData = new FormData();
+  //   // formData.append("profile_photo", {
+  //   //   uri: imageUri,
+  //   //   name: `profile.${fileExtension}`, // اسم الملف مع الامتداد الصحيح
+  //   //   type: fileType, // نوع الملف الصحيح
+  //   // } as any); // تحويل البيانات إلى النوع المناسب
+
+
+  //   const formData = new FormData();
+
+  //   // If you want to send the imageUri directly as the file (without modification)
+  //   formData.append("profile_photo", {
+  //     uri: imageUri,  // The path of the image
+  //     name: imageUri.split('/').pop(),  // Use the file name extracted from the URI
+  //     type: 'image/jpeg', // Default type (you can adjust this if you know the exact mime type)
+  //   } as any)
+  //   formData.append("name", user?.data?.client?.name || user?.data?.user?.name);
+  //   formData.append("phone_number", user?.data?.client?.phone_number || user?.data?.user?.phone_number || '202020',);
+  //   formData.append("email", user?.data?.client?.email || user?.data?.user?.email);
+
+
+
+
+  //   console.log('formmmmmmmmmmm', formData)
+  //     const response = await axios.post(
+  //       "https://ajwan.mahmoudalbatran.com/api/updateprofile",
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //           Authorization: `Bearer ${user?.data?.token}`,
+  //         },
+  //       }
+  //     );
+
+  //     if (response?.data) {
+  //       Alert.alert("نجاح", "تم تحديث صورة الملف الشخصي بنجاح.");
+
+  //     } else {
+  //       Alert.alert("خطأ", "حدث خطأ أثناء تحديث الصورة.");
+  //       console.log(response?.data, 'rrrrrrrrrrrrrrrrrrrr')
+  //     }
+  //     setImageModalVisible(false);
+
+  //   } catch (error: any) {
+  //     console.error("Upload Error:", error.response?.data?.message);
+
+  //     if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+  //       Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+  //     } else {
+  //       Alert.alert("خطأ", error.response?.data?.message || "فشل في تحديث صورة الملف الشخصي.");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
   const uploadProfileImage = async (imageUri: string) => {
-    setLoading(true)
+    setLoading(true);
     try {
+      //     console.log(imageUri, 'uriiiiiiiiiiiiii')
+      //     const fileType = mime.getType(imageUri) || "image/jpeg";
+      //     const fileExtension = fileType.split("/")[1];
+      //     const imageName = `profile.${fileExtension}`;
+
+      //     const formData = new FormData();
+
+      //     formData.append("profile_photo", {
+      //       uri: imageUri,
+      //       name: imageName,
+      //       type: fileType,
+      //     } as any);
+
+      //     formData.append("name", user?.data?.client?.name || user?.data?.user?.name);
+      //     formData.append(
+      //       "phone_number",
+      //       user?.data?.client?.phone_number || user?.data?.user?.phone_number || "202020"
+      //     );
+      //     formData.append("email", user?.data?.client?.email || user?.data?.user?.email);
+
+      //     const response = await axios.post(
+      //       "https://ajwan.mahmoudalbatran.com/api/updateprofile",
+      //       formData,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //           Authorization: `Bearer ${user?.data?.token}`,
+      //         },
+      //       }
+      //     );
+      // console.log(response)
+      //     if (response?.data) {
+      //       Alert.alert("نجاح", "تم تحديث صورة الملف الشخصي بنجاح.");
+      //       setImageModalVisible(false);
+      //     } else {
+      //       Alert.alert("خطأ", "حدث خطأ أثناء تحديث الصورة.");
+      //       console.log(response?.data, "rrrrrrrrrrrrrrrrrrrr");
+      //     }
+
       const formData = new FormData();
-      formData.append("profile_photo", {
-        uri: imageUri,
-        name: "profile.jpg",
-        type: "image/jpeg",
-      } as any);
+      const fileType = mime.getType(imageUri) || "image/jpeg";
+      const fileExtension = fileType.split("/")[1];
+      const imageName = `profile.${fileExtension}`;
+      formData.append("name", user?.data?.client?.name || user?.data?.user?.name);
+      formData.append(
+        "phone_number",
+        user?.data?.client?.phone_number || user?.data?.user?.phone_number || "202020"
+      );
+      formData.append("email", user?.data?.client?.email || user?.data?.user?.email);
 
-      // Replace with your API call, e.g.: await yourApi.updateProfileImage(formData);
+      //     // إعداد ملف الصورة
+      // formData.append("profile_photo_path", {
+      //   uri: imageUri, // حط uri الخاص بك هنا
+      //   name: "profile.jpg", // اسم عشوائي أو الاسم الحقيقي
+      //   type: "image/jpeg",   // لازم تحدد نوع الصورة
+      // });
 
-      Alert.alert("Success", "Profile image updated successfully.");
-      setImageModalVisible(false);
-    } catch (error) {
-      Alert.alert("Error", "Failed to update profile image.");
+      formData.append("profile_photo_path", {
+        uri: imageUri, // حط uri الخاص بك هنا
+        name: imageName, // اسم عشوائي أو الاسم الحقيقي
+        type: fileType,   // لازم تحدد نوع الصورة
+      });
+
+      const response = await fetch("https://ajwan.mahmoudalbatran.com/api/updateprofile", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          Authorization: `Bearer ${user?.data?.token}`,
+          // لا تحط Content-Type هنا! خلي React Native يحطها تلقائيًا
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log(data, 'tttttttttttttttttttttttttttttttttttttttttttt');
+      if (data) {
+        Alert.alert("نجاح", "تم تحديث صورة الملف الشخصي بنجاح.");
+        setImageModalVisible(false);
+        dispatch(updateUser(data?.user));
+      } else {
+        Alert.alert("خطأ", "حدث خطأ أثناء تحديث الصورة.");
+        console.log(data, "rrrrrrrrrrrrrrrrrrrr");
+      }
+
+    } catch (error: any) {
+      console.error("Upload Error:", error.response?.data || error.message);
+
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+      } else {
+        Alert.alert("خطأ", error.response?.data?.message || "فشل في تحديث صورة الملف الشخصي.");
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   // Function to handle password change
   const changePassword = async () => {
@@ -90,7 +246,7 @@ const Profile = () => {
       Alert.alert("Validation Error", "New password and confirmation do not match.");
       return;
     }
-    
+
     try {
       // Replace with your API call to update the password:
       // e.g., await yourApi.changePassword({ oldPassword, newPassword });
@@ -112,7 +268,14 @@ const Profile = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      Alert.alert("Error ", `Failed to change password.with message ${error}`);
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
+
+      Alert.alert("خطأ ", `فشل في تغيير الرقم السري ${error}`);
+
+
     } finally {
       setLoading(false)
     }
@@ -122,20 +285,20 @@ const Profile = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 16 }}>
         <Text style={styles.headerText}>الملف الشخصي</Text>
-        
+
         <View style={styles.card}>
           <View style={{ alignItems: "center", marginBottom: 16 }}>
             <TouchableOpacity onPress={() => setImageModalVisible(true)}>
               {profileImage?.startsWith('https://ui-avatars.com/api') ? (
-                <View  className=" rounded-full h-[110px] w-[110px] border-[3px] border-gray-300 shadow-sm shadow-neutral-300 flex items-center justify-center bg-purple-500 "><Text className="uppercase font-bold text-6xl text-white">{user?.data?.client?.name.charAt(0) || user?.data?.user?.name.charAt(0)}</Text></View>
-                
+                <View className=" rounded-full h-[110px] w-[110px] border-[3px] border-gray-300 shadow-sm shadow-neutral-300 flex items-center justify-center bg-purple-500 "><Text className="uppercase font-bold text-6xl text-white">{user?.data?.client?.name.charAt(0) || user?.data?.user?.name.charAt(0)}</Text></View>
+
               ) : (
                 <Image source={{ uri: profileImage }} style={styles.profileImage} />
 
               )}
             </TouchableOpacity>
           </View>
-          
+
           <InputField
             label="Name"
             placeholder={user?.data?.client?.name || user?.data?.user?.name}
@@ -154,22 +317,26 @@ const Profile = () => {
 
           <InputField
             label="Phone"
-            placeholder={user?.data?.phone_number || "Not Found"}
+            placeholder={user?.data?.client?.phone_number || user?.data?.user?.phone_number ||"Not Found"}
             containerStyle="w-full"
             inputStyle="p-3.5"
             editable={false}
           />
-
-          <CustomButton 
-            title="تغيير كلمة المرور" 
-            onPress={() => setPasswordModalVisible(true)} 
-            className="mt-4" 
+          <CustomButton
+            title="تغيير البيانات الشخصية "
+            onPress={() => setPersonalDataModalVisible(true)}
+            className="mt-4"
+          />
+          <CustomButton
+            title="تغيير كلمة المرور"
+            onPress={() => setPasswordModalVisible(true)}
+            className="mt-4"
           />
 
-          <CustomButton 
-            title="تسجيل الخروج" 
-            onPress={onLogout} 
-            className="mt-6" 
+          <CustomButton
+            title="تسجيل الخروج"
+            onPress={onLogout}
+            className="mt-6"
           />
         </View>
       </ScrollView>
@@ -184,7 +351,11 @@ const Profile = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>تغيير الصورة الشخصية</Text>
-            <CustomButton title="اختيار صورة" onPress={pickImage} className="mb-2" />
+            {loading ? (
+              <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5 mb-2">
+                <ActivityIndicator size={30} color="blue" />
+              </View>
+            ) : <CustomButton title="اختيار صورة" onPress={pickImage} className="mb-2" />}
             <CustomButton title="إلغاء" onPress={() => setImageModalVisible(false)} />
           </View>
         </View>
@@ -221,10 +392,48 @@ const Profile = () => {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
-            {loading ?<View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5 mb-2">
-                        <ActivityIndicator size={30} color="blue" />
-                      </View> : 
-                      <CustomButton title="حفظ" onPress={changePassword} className="mb-2" />}
+            {loading ? <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5 mb-2">
+              <ActivityIndicator size={30} color="blue" />
+            </View> :
+              <CustomButton title="حفظ" onPress={changePassword} className="mb-2" />}
+            <CustomButton title="إلغاء" onPress={() => setPasswordModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal for changing personal data */}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={personalDataModalVisible}
+        onRequestClose={() => setPersonalDataModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>تغيير البيانات الشخصية </Text>
+            <TextInput
+              placeholder={user?.data?.client?.name || user?.data?.user?.name}
+              style={styles.input}
+              // value={user?.data?.client?.name || user?.data?.user?.name}
+              onChangeText={setOldPassword}
+            />
+            <TextInput
+              placeholder={user?.data?.client?.phone_number || user?.data?.user?.phone_number}
+              style={styles.input}
+              // value={user?.data?.client?.phone_number || user?.data?.user?.phone_number}
+              onChangeText={setNewPassword}
+            />
+            <TextInput
+              placeholder={user?.data?.client?.email || user?.data?.user?.email}
+              style={styles.input}
+              // value={user?.data?.client?.email || user?.data?.user?.email}
+              onChangeText={setConfirmPassword}
+            />
+            {loading ? <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5 mb-2">
+              <ActivityIndicator size={30} color="blue" />
+            </View> :
+              <CustomButton title="حفظ" onPress={changePassword} className="mb-2" />}
             <CustomButton title="إلغاء" onPress={() => setPasswordModalVisible(false)} />
           </View>
         </View>

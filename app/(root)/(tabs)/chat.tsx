@@ -338,6 +338,7 @@ let i = 0;
 const ChatConversationsPage = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [newOne, setNewOne] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -345,7 +346,7 @@ const ChatConversationsPage = () => {
   // addConversation
 const setConversation = useConversationStore((state) => state.setConversation);
 
-    const { currentUser: user } = useSelector((state) => state?.auth);
+    const { currentUser: user, isNewMessageNotification } = useSelector((state) => state?.auth);
 
 
   // Fetch conversations when page changes or app loads
@@ -366,7 +367,9 @@ const setConversation = useConversationStore((state) => state.setConversation);
 
       console.log(response.data?.data, 'daaaaaaaataaaaaaaaaaaa');
       if (newConversations?.length > 0) {
-        setConversations((prev) => [...prev, ...newConversations]);
+        if (!newOne) {
+          setConversations((prev) => [...prev, ...newConversations]);
+        }
         setHasMore(response.data.next_page_url !== null);
         setPage((prev) => prev + 1);
         return;
@@ -377,6 +380,7 @@ const setConversation = useConversationStore((state) => state.setConversation);
           const newConv = await axios.post(`https://ajwan.mahmoudalbatran.com/api/AddConversation`, {}, {
             headers: { Authorization: `Bearer ${user?.data?.token}` },
           });
+          setNewOne(true);
           console.log( 'no daat daaaaaaaataaaaaaaaaaaa', newConv?.data)
 
 
@@ -395,7 +399,9 @@ const setConversation = useConversationStore((state) => state.setConversation);
       // Check if there are more conversations to load
   
     } catch (error) {
-      console.error(error);
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+      }
     } finally {
       setLoading(false);
     }
@@ -413,7 +419,7 @@ const setConversation = useConversationStore((state) => state.setConversation);
   useEffect(() => {
     setConversation(null)
     fetchConversations();
-  }, []);
+  }, [isNewMessageNotification]);
 
   // Render a single conversation item
   const renderConversation = ({ item }) => {

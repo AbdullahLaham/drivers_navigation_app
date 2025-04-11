@@ -11,11 +11,13 @@ import { fetchAPI } from "@/lib/fetch";
 import { useDispatch, useSelector } from "react-redux";
 import { login, register } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
+import * as Device from "expo-device";
+
 // import { Loader } from "lucide-react-native";
 
 const SignUp = () => {
   // const { isLoaded, signUp, setActive } = useSignUp();
-
+  const [deviceName, setDeviceName] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false); // State to track loading
@@ -51,7 +53,8 @@ const SignUp = () => {
           name: form?.name,
           email: form?.email,
           password: form?.password,
-          phone_number: form?.phone_number
+          phone_number: form?.phone_number,
+          device_name: deviceName,
         }
       ));
 
@@ -63,13 +66,17 @@ const SignUp = () => {
         router.push(`/(root)/(tabs)/home`);
       }
 
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.log(err, 'errrrrrrrrr')
-      Alert.alert("Error");
-    }finally {
-      setLoading(false); // Set loading to false after the sign up process finishes
+    }  catch (error) {
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
+
+      Alert.alert("خطأ ", `فشل في تغيير الرقم السري ${error}`);
+
+
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -84,6 +91,13 @@ const SignUp = () => {
     if (user?.data?.token) {
       router.push(`/(root)/(tabs)/home`);
     }
+
+     async function getDeviceName() {
+          const name = await Device.deviceName;
+          setDeviceName(name || "Unknown Device");
+        }
+    
+        getDeviceName();
   }, []);
 
 
@@ -158,7 +172,7 @@ const SignUp = () => {
           
           {/* <OAuth /> */}
           <TouchableOpacity onPress={() => router.replace("/(auth)/sign-in")}
-            className="text-lg text-center text-general-200 mt-10 flex flex-row-reverse items-center gap-2"
+            className="text-lg text-center text-general-200 mt-10 flex flex-row items-center gap-2"
           >
             <Text className="font-semibold ">هل أنت زبون عند أجوان ?</Text>
             <Text className="text-primary-500 font-JakartaExtraBold">سجل الدخول</Text>

@@ -9,9 +9,10 @@ import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { useRouter } from "expo-router";
+import * as Device from "expo-device";
 // import { Loader, LoaderCircle } from "lucide-react-native";
 const SignIn = () => {
-
+  const [deviceName, setDeviceName] = useState("");
   const [loading, setLoading] = useState(false);
 
 
@@ -34,10 +35,15 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-
+      console.log('data', {
+        email: form?.email,
+        password: form?.password,
+        device_name: deviceName
+      })
       const res = dispatch(login({
         email: form?.email,
         password: form?.password,
+        device_name: deviceName
       }));
 
       const client = await res;
@@ -56,11 +62,17 @@ const SignIn = () => {
       //   console.log(JSON.stringify(signInAttempt, null, 2));
       //   Alert.alert("Error", "Log in failed. Please try again.");
       // }
-    } catch (err: any) {
-      console.log(JSON.stringify(err, null, 2));
-      Alert.alert("Error");
-    }finally {
-      setLoading(false);
+    }  catch (error) {
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
+
+      Alert.alert("خطأ ", `فشل في تغيير الرقم السري ${error}`);
+
+
+    } finally {
+      setLoading(false)
     }
   }, [ form]);
 
@@ -68,8 +80,15 @@ const SignIn = () => {
     if (user?.data?.token) {
       router.push(`/(root)/(tabs)/home`);
     }
+
+    async function getDeviceName() {
+      const name = await Device.deviceName;
+      setDeviceName(name || "Unknown Device");
+    }
+
+    getDeviceName();
+
   }, []);
- 
 
 
   return (
@@ -134,7 +153,7 @@ const SignIn = () => {
           <TouchableOpacity onPress={() => router.replace("/(auth)/sign-up")}
 
             // href="/sign-up"
-            className="text-lg text-center text-general-200 mt-10 flex flex-row-reverse items-center gap-2 "
+            className="text-lg text-center text-general-200 mt-10 flex flex-row items-center gap-2 "
           >
             <Text className="font-semibold">هل أنت زبون جديد?</Text>
             <Text className="text-primary-500 font-JakartaExtraBold">أنشىء حسابا</Text>

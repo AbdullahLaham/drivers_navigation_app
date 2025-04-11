@@ -54,18 +54,17 @@ export default function Layout() {
       }}
     >
   
-      
-
-      <Tabs.Screen
-        name="home"
+  <Tabs.Screen
+        name="prices"
         options={{
-          title: "Home",
+          title: "Prices",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.home} focused={focused} />
+            <TabIcon source={icons.dollar} focused={focused} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="rides"
         options={{
@@ -78,13 +77,15 @@ export default function Layout() {
       />
       
       
+      
+      
       <Tabs.Screen
-        name="prices"
+        name="home"
         options={{
-          title: "Prices",
+          title: "Home",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.dollar} focused={focused} />
+            <TabIcon source={icons.home} focused={focused} />
           ),
         }}
       />
@@ -99,16 +100,6 @@ export default function Layout() {
         }}
       /> */}
       <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.profile} focused={focused} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="chat"
         options={{
           title: "chat",
@@ -118,6 +109,17 @@ export default function Layout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon source={icons.profile} focused={focused} />
+          ),
+        }}
+      />
+      
     </Tabs>
   );
 }

@@ -94,6 +94,7 @@ import { format, parseISO } from 'date-fns';
 
 const Notification = () => {
   const queryClient = useQueryClient();
+ 
 
   const convertToDate = (isoString) => format(parseISO(isoString), 'yyyy-MM-dd');
   const convertToTime = (isoString) => format(parseISO(isoString), 'HH:mm');
@@ -149,7 +150,11 @@ const Notification = () => {
       })
     }
     read();
-  }, [])
+  }, []);
+
+  // console.log(notifications[0]?.data?.from?.profile_photo_url, 'yyyyyyyyyyyyyyyyyyyyyyyy')
+
+
   return (
     <View>
       <View className="flex items-center justify-center p-3 bg-[#6d6969] relative">
@@ -165,12 +170,12 @@ const Notification = () => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={() => (
             <View className="w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7">
-              <View className="flex items-center flex-row-reverse">
+              <View className="flex items-center flex-row">
                 <View className="w-6 h-6 bg-gray-300 rounded-full ml-4" />
                 <View className="h-4 w-32 bg-gray-300 rounded my-1" />
               </View>
 
-              <View className="flex flex-row-reverse items-center justify-between w-full">
+              <View className="flex flex-row items-center justify-between w-full">
                 <View className="flex flex-row items-center">
                   <View className="h-3 w-20 bg-gray-300 rounded ml-4" />
                   <View className="w-4 h-4 bg-gray-300 rounded-full ml-3" />
@@ -188,22 +193,27 @@ const Notification = () => {
           data={notifications}
           keyExtractor={(item) => item?.id}
           renderItem={({ item }) => (
-            <View className={`w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-7 ${item?.read_at == null ? 'bg-gray-600' : ''}`}>
+            
+            <View className={`w-[100%] flex flex-col mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm px-5 ${item?.read_at == null ? 'bg-gray-200' : ''}`}>
 
 
-              <View className="flex items-center flex-row-reverse">
-                <Image source={icons.bell} className="w-6 h-6 ml-4" />
-                <Text className="text-gray-400 my-1 text-md">{item?.data?.body} </Text>
+              <View className="flex items-center flex-row">
+                <View className="flex items-center flex-row gap-2">
+                <Image source={{uri: item?.data?.from?.profile_photo_url}} className="w-[2.5rem] h-[2.5rem] object-cover rounded-full" />
+                <Text className='text-gray-600 font-bold text-sm'>{item?.data?.from?.name}</Text>
+                {/* <Text className="text-gray-400 my-1 text-md">{item?.data?.body} </Text> */}
+              </View>
+                <Text className="text-gray-800 my-1 text-lg font-bold  mx-5">{item?.data?.body} </Text>
               </View>
 
-              <View className="flex flex-row-reverse items-center justify-between w-full">
+              <View className="flex flex-row items-center justify-between w-full mt-1 px-5">
                 <View className="flex flex-row items-center">
-                  <Text className="text-gray-500 text-sm font-semibold -ml-4">{convertToDate(item?.created_at)}</Text>
-                  <Image source={icons.clock} className="w-4 h-4 ml-3" />
+                  <Text className="text-gray-500 text-md font-semibold -ml-4">{item?.driver?.name} {convertToDate(item?.created_at)}</Text>
+                  <Image source={icons.date} className="w-5 h-5 ml-3" />
                 </View>
                 <View className="flex flex-row items-center">
-                  <Text className="text-gray-500 text-sm font-semibold">{convertToTime(item?.created_at)}</Text>
-                  <Image source={icons.date} className="w-6 h-6 ml-1" />
+                  <Text className="text-gray-500 text-md font-semibold">{convertToTime(item?.created_at)}</Text>
+                  <Image source={icons.clock} className="w-5 h-5 ml-1" />
                 </View>
               </View>
             </View>

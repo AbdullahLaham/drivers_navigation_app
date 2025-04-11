@@ -132,6 +132,10 @@ export default function Page() {
       dispatch(createRide());
 
     } catch (error) {
+      if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+        Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        return; // لا نسجل خروج المستخدم
+      }
 
     } finally {
       setLoading(false)
@@ -267,8 +271,28 @@ export default function Page() {
         }
 
       } catch (error) {
-        dispatch(logout());
-        router.replace("/(auth)/sign-in");
+        // dispatch(logout());
+        console.log(error, 'eeeeeeeerrrrrrrrorr');
+
+        if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+          Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+          return; // لا نسجل خروج المستخدم
+        }
+
+        if (!error.response) {
+          Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+          return; // لا نسجل خروج المستخدم
+        }
+
+
+         // التحقق مما إذا كان الخطأ بسبب انتهاء صلاحية التوكن أو خطأ في المصادقة
+         if (error.response.status === 401 || error.response.status === 403) {
+          dispatch(logout());
+          router.replace("/(auth)/sign-in");
+        } else {
+          Alert.alert("حدث خطأ", "يرجى المحاولة مرة أخرى.");
+        }
+        // router.replace("/(auth)/sign-in");
       }
     };
 
@@ -334,7 +358,9 @@ export default function Page() {
       setNotificationCount(res?.data);
       console.log('ressssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss', res?.data)
       }catch (error) {
-      console.log(error, 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+        if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+          Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+        }
   }
     
     
@@ -344,10 +370,11 @@ export default function Page() {
   }, [])
 
   return (
+    
     <SafeAreaView className="flex-1 relative ">
       <TouchableOpacity onPress={() => router.push('/(root)/notification')} className=" absolute top-3 left-3 flex items-center justify-center bg-emerald-200 rounded-full w-10 h-10 z-10 p-5 active:bg-green-300 transition-all ">
         <Image source={icons.bell} className="w-8 h-8" />
-        <View className="w-5 h-5 rounded-full bg-red-500 absolute -left-1 -bottom-1 flex items-center justify-center  "><Text className="text-sm text-white">{notificationCount}</Text></View>
+        <View className="w-5 h-5 rounded-full bg-red-500 absolute -right-1 -top-1 flex items-center justify-center  "><Text className="text-sm text-white">{notificationCount}</Text></View>
       </TouchableOpacity>
       {/* 🔍 مربع البحث */}
 

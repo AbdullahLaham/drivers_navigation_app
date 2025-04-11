@@ -1,3 +1,5 @@
+
+
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -6,13 +8,22 @@ import { onboarding } from '@/constants';
 import { router } from 'expo-router';
 import CustomButton from '@/components/CustomButton';
 import { useSelector } from 'react-redux';
-const Onboarding = () => {
+import { useNavigation } from "expo-router";
+
+const Welcome = () => {
   const swiperRef = useRef<Swiper>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const isLastSlide = activeIndex == onboarding.length - 1
   const {currentUser: user, error, isError} = useSelector((state: any) => state?.auth);
 
-  
+  const navigation = useNavigation();
+
+
+  useEffect(() => {
+    navigation.setOptions({ title: "أهلا وسهلا بك : في مكتب أجوان" }); // تعيين عنوان الصفحة
+  }, [navigation]);
+
+
  useEffect(() => {
     if (user?.data?.token) {
       router.push(`/(root)/(tabs)/home`);
@@ -20,7 +31,7 @@ const Onboarding = () => {
   }, []);
  
   return (
-    <SafeAreaView className="flex h-full items-center justify-between bg-black">
+    <SafeAreaView className="flex h-full items-center justify-between bg-black z-[100] absolute top-0 left-0 right-0 bottom-0 ">
 
       <TouchableOpacity
         onPress={() => {
@@ -73,6 +84,6 @@ const Onboarding = () => {
   )
 }
 
-export default Onboarding
+export default Welcome
 
 const styles = StyleSheet.create({})
