@@ -112,16 +112,23 @@ console.log(orderDetails?.driver?.profile_photo_url, 'tttttttttttttttttttttttttt
           <View className=' mt-5 bg-gray-200  my-3 py-3 px-5'><Text className='text-2xl font-bold text-start  text-gray-600'>معلومات طلبك </Text></View>
 
           <View className='w-[100%]  flex flex-col  justify-start mb-2 mx-1  border-b r border-gray-400 p-1 rounded-sm px-4'>
-            <View className='flex items-center flex-row '>
+            <View className='flex items-center flex-row gap-2'>
               {/* <MapPin color="green" size={20} /> */}
               <Image source={icons.point} className={`w-6 h-6 ml-4`} />
-              <Text className='text-gray-500 my-1 font-semibold text-md'><Text className='font-bold text-gray-800 text-md'>   {orderDetails?.order?.from}  </Text>نقطة الانطلاق  </Text>
+              {/* <Text className='text-gray-500 my-1 font-semibold text-md'><Text className='font-bold text-gray-800 text-md'>   {orderDetails?.order?.from}  </Text>   </Text> */}
+              <View className=''><Text className='text-gray-600 font-semibold  '> <Text className='w-[300px] text-start '>نقطة الانطلاق : </Text><Text className='w-[500px] text-end'>{orderDetails?.order?.from}</Text></Text></View>
             </View>
+            
             <View className='flex items-center flex-row gap-2 '>
               {/* <Target color="red" size={20} /> */}
               <Image source={icons.to} className={`w-6 h-6 ml-4`} />
-              <Text className='text-gray-500 my-1 font-semibold text-md'><Text className='font-bold text-gray-800 text-md'>{orderDetails?.order?.to} </Text>    نقطة الوصول</Text>
+              {/* <Text className='text-gray-500 my-1 font-semibold text-md'><Text className='font-bold text-gray-800 text-md'>{orderDetails?.order?.to} </Text>     </Text> */}
+              <View className=' '><Text className='text-gray-600 font-semibold  '> <Text className=' text-start '>نقطة الوصول :</Text> <Text className='text-end'>{orderDetails?.order?.to}</Text></Text></View>
+
             </View>
+
+
+         
 
 
 
@@ -141,9 +148,10 @@ console.log(orderDetails?.driver?.profile_photo_url, 'tttttttttttttttttttttttttt
             </View>
 
             <View className='flex flex-row items-center justify-between w-full mt-1'>
-              <View className='flex flex-row items-center gap-2'><Text className='text-lg' style={{ fontWeight: "bold", color: "black" }}> السعر بالشيكل ₪ :</Text><Text className='text-gray-500 text-lg font-bold' >{orderDetails?.order?.total_price || "لم يتم تحديد السعر"}</Text></View>
+              <View className='flex flex-row items-center gap-2'><Text className='text-lg' style={{ fontWeight: "bold", color: "black" }}> السعر بالشيكل ₪ :</Text><Text className='text-gray-500 text-lg font-bold' >{orderDetails?.order?.price || "لم يتم تحديد السعر"}</Text></View>
+              <View><Text className='text-xl text-gray-700 font-bold'>{orderDetails?.order?.created_date}</Text></View>
             </View>
-            <View><Text className='text-xl text-gray-700 font-bold'>{orderDetails?.order?.created_date}</Text></View>
+            
 
 
 

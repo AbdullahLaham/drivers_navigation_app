@@ -159,7 +159,7 @@ const Notification = () => {
     <View>
       <View className="flex items-center justify-center p-3 bg-[#6d6969] relative">
         <Text className="text-white text-center font-bold text-lg block">الإشعارات</Text>
-        <TouchableOpacity className="ml-auto absolute right-4 top-2 rounded-full px-2 py-1" onPress={() => router.push('/(root)/(tabs)/home')}>
+        <TouchableOpacity className="ml-auto absolute left-4 top-2 rounded-full px-2 py-1" onPress={() => router.push('/(root)/(tabs)/home')}>
           <Image source={icons.arrowRight} className="w-8 h-8 rounded-full p-2" />
         </TouchableOpacity>
       </View>

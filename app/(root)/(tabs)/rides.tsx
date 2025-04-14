@@ -182,7 +182,7 @@ const Rides = () => {
 
 
   const renderSkeleton = () => (
-    <View className='w-[100%] flex flex-col items-end justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
+    <View className='w-[100%] flex flex-col justify-start mb-2 mx-1 border-b border-gray-400 p-1 rounded-sm'>
       <View className='flex items-center flex-row'>
 
         <View className='w-40 h-4 bg-gray-300 rounded-md' />
@@ -263,7 +263,7 @@ const Rides = () => {
       <Text className='flex items-center justify-center p-3 bg-[#2b2b2b] text-white text-center font-bold text-lg'>
         طلباتك 
       </Text>
-      <View className='flex flex-row-reverse items-center justify-between p-5'>
+      <View className='flex flex-row items-center justify-between p-5'>
         <TouchableOpacity className={`px-10 py-3 rounded-lg ${state === 'rides' ? 'bg-blue-400 text-white' : ''}`} onPress={() => setState('rides')}>
           <Text className={` font-semibold ${state === 'rides' ? 'text-white' : 'text-black border border-gray-500 px-5 py-2 rounded-lg'}`}>الطلبات</Text>
         </TouchableOpacity>

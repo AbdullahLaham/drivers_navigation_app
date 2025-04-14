@@ -167,7 +167,9 @@ const Profile = () => {
         setPrices(response.data.prices);
         groupByStart(response.data.prices);
       } catch (error) {
-        console.error("Error fetching prices:", error);
+        if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+                Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+              }
       }finally {
         setLoading(false);
       }
@@ -220,10 +222,10 @@ const Profile = () => {
         renderItem={({ item }) => (
           <View className='bg-white p-5 mx-4 my-3 rounded-xl shadow-md border border-gray-200'>
             <TouchableOpacity
-              className='flex-row items-center justify-between'
+              className='flex-row items-center justify-between my-2'
               onPress={() => setExpandedStart(expandedStart === item ? null : item)}
             >
-              <View className='flex-row items-center'>
+              <View className='flex-row items-center '>
                 <Image source={icons.map} className='w-8 h-8 mr-3' />
                 <Text className='text-lg font-semibold text-gray-800'>{item}</Text>
               </View>
@@ -246,26 +248,26 @@ const Profile = () => {
                         <View className='flex items-center flex-row gap-2'>
                           {/* <MapPin color="green" size={20} /> */}
                           <Image source={icons.dollar} className={`w-6 h-6 ml-4 fill-black`} />
-                          <Text className='text-gray-400 my-1  text-md'>{subItem?.price} شيكل</Text>
+                          <Text className='text-gray-600 my-1  text-lg font-bold '>{subItem?.price} شيكل</Text>
                         </View>
                         <View className='flex items-center flex-row gap-2 mt-1'>
                           {/* <Target color="red" size={20} /> */}
                           {/* <Image source={icons.selectedMarker} className={`w-6 h-6 ml-4`} /> */}
-                          <Image source={icons.clock} className={`w-6 h-6 ml-4`} />
-                          <Text className='text-gray-400 my-1  text-md'>15 دقيقة</Text>
+                          {/* <Image source={icons.clock} className={`w-6 h-6 ml-4`} /> */}
+                          <Text className='text-gray-400 my-1  text-md'></Text>
                         </View>
                       </View>
                       <View className='flex-1'>
                         <View className='flex items-center flex-row gap-2'>
                           {/* <MapPin color="green" size={20} /> */}
                           <Image source={icons.point} className={`w-6 h-6 ml-4`} />
-                          <Text className='text-gray-400 my-1  text-md'>{subItem?.name_one}</Text>
+                          <Text className='text-gray-500 my-1  text-lg'>{subItem?.name_one}</Text>
                         </View>
                         <View className='flex items-center flex-row mt-1 gap-2'>
                           {/* <Target color="red" size={20} /> */}
                           {/* <Image source={icons.selectedMarker} className={`w-6 h-6 ml-4`} /> */}
                           <Image source={icons.to} className={`w-6 h-6 ml-4`} />
-                          <Text className='text-gray-400 my-1  text-md'>{subItem?.name_two}</Text>
+                          <Text className='text-gray-500 my-1  text-lg'>{subItem?.name_two}</Text>
                         </View>
                       </View>
                     </View>

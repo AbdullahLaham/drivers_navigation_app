@@ -144,6 +144,8 @@ const Chat = () => {
             );
 
             if (res?.data) {
+                console.log(res?.data, 'yyyyyyyyyyyyyyyyyyyyyyyyyyy');
+                
                 setMessages((prev) => [
                     {
                         id: Date.now(),
@@ -152,6 +154,8 @@ const Chat = () => {
                     },
                     ...prev
                 ]);
+
+
                 setNewMessage("");
             }
         } catch (error) {
@@ -191,6 +195,9 @@ const Chat = () => {
                     }`}
             >
                 <Text className="text-white">{item?.body}</Text>
+                {/* {item?.participants[0]?.pivot?.read_at && <View>dd</View>} */}
+                {item?.recipients ? item?.recipients[0]?.pivot?.read_at && <Text><Image className="w-4 h-4 my-[.5rem]" source={images.check} /></Text> : ''}
+
             </View>
         );
     };
@@ -208,6 +215,7 @@ const Chat = () => {
             fetchMessages(conversationId, page + 1); // Fetch next page
         }
     };
+    console.log('messages0', messages[messages?.length - 1]?.recipients[0]?.pivot);
 
 
     const skeletonMessages = () => {
@@ -324,6 +332,8 @@ const Chat = () => {
         
         read()
     }, [conversationId, isNewMessageNotification])
+
+    
 read();
 
 
@@ -357,10 +367,10 @@ read();
             {/* العنوان */}
             <View className="bg-gray-800 p-4 flex flex-row items-center gap-2 justify-center">
                 <Text className="text-white text-center text-lg font-bold flex flex-row items-center">
-                    {currentCon?.participants?.[0]?.name || "حساب محذوف"} 
+                    {currentCon?.participants?.[0]?.name} 
                 </Text>
 
-                <TouchableOpacity className="ml-auto absolute right-4 top-2 rounded-full px-2 py-1 mt-1" onPress={() => router.push('/(root)/(tabs)/chat')}>
+                <TouchableOpacity className="ml-auto absolute left-4 top-2 rounded-full px-2 py-1 mt-1" onPress={() => router.push('/(root)/(tabs)/chat')}>
                     <Image source={icons.arrowRight} className="w-8 h-8 rounded-full p-2" />
                 </TouchableOpacity>
                 {currentCon?.participants?.[0]?.name ? (

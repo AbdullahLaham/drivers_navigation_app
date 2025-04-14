@@ -41,6 +41,17 @@ const Profile = () => {
   // States for password change
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+
+  const [updateName, setUpdateName] = useState("");
+  const [updatePhoneNumber, setUpdatePhoneNumber] = useState("");
+  const [updateEmail, setUpdateEmail] = useState("");
+  const [personalDataError, setPersonalDataError] = useState("");
+
+
+
+
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -261,7 +272,8 @@ const Profile = () => {
           }
         });
 
-      Alert.alert("Success", "Password changed successfully.");
+      Alert.alert("تم بنجاح", "تم تغيير الرقم السري بنجاح");
+      setPasswordError("")  
       setPasswordModalVisible(false);
       // Reset fields
       setOldPassword("");
@@ -272,8 +284,11 @@ const Profile = () => {
         Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
         return; // لا نسجل خروج المستخدم
       }
+      setPasswordError(error?.response?.data?.message)
+      console.log('eeeeeeeeeeeeeeeeeeee', error?.response?.data?.message)
 
-      Alert.alert("خطأ ", `فشل في تغيير الرقم السري ${error}`);
+
+      // Alert.alert(`${error?.response?.data?.message}`);
 
 
     } finally {
@@ -281,6 +296,50 @@ const Profile = () => {
     }
   };
 
+
+  // Function to handle personal data (name, email, phone_nu,ber) change
+const changePersonalData = async () => {
+  // Basic validation: ensure new password and confirmation match
+  setLoading(true)
+
+
+  try {
+    // Replace with your API call to update the password:
+    // e.g., await yourApi.changePassword({ oldPassword, newPassword });
+    const res = await axios.post(`https://ajwan.mahmoudalbatran.com/api/updateotherprofile`, {
+      name: updateName || user?.data?.client?.name || user?.data?.user?.name ,
+      email: updateEmail || user?.data?.client?.email || user?.data?.user?.email,
+      phone_number: updatePhoneNumber || user?.data?.client?.phone_number || user?.data?.user?.phone_number,
+    },
+      {
+        headers: {
+          Authorization: `Bearer ${user?.data?.token}`
+        }
+      });
+      dispatch(updateUser(res?.data?.user));
+      // console.log(res?.data, 'ddddddddddddddddddddddddddddddddd')
+
+    Alert.alert("تم بنجاح", "تم نغيير بياناتك الشخصيه بنجاح.");
+    setPersonalDataError("")
+    setPasswordModalVisible(false);
+    setPersonalDataModalVisible(false);
+    // Reset fields
+    setUpdateEmail("");
+    setUpdateName("");
+    setUpdatePhoneNumber("");
+  } catch (error) {
+    if (error.code === "ERR_NETWORK" || error.message.includes("Network Error")) {
+      Alert.alert("خطأ في الاتصال", "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.");
+      return; // لا نسجل خروج المستخدم
+    }
+    setPersonalDataError(error?.response?.data?.message)
+    // Alert.alert("خطأ ", `فشل في تغيير بياناتك الشخصيه ${error}`);
+
+
+  } finally {
+    setLoading(false)
+  }
+};
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 16 }}>
@@ -371,6 +430,7 @@ const Profile = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>تغيير كلمة المرور</Text>
+            {passwordError && <Text className="mx-5 text-red-500 font-JakartaBold text-md bg-gray-100 rounded-lg p-2">{passwordError}</Text>}
             <TextInput
               placeholder="أدخل كلمة المرور القديمة"
               secureTextEntry
@@ -412,29 +472,30 @@ const Profile = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>تغيير البيانات الشخصية </Text>
+            {personalDataError && <Text className="mx-5 text-red-500 font-JakartaBold text-md bg-gray-100 rounded-lg p-2">{personalDataError}</Text>}
             <TextInput
               placeholder={user?.data?.client?.name || user?.data?.user?.name}
               style={styles.input}
-              // value={user?.data?.client?.name || user?.data?.user?.name}
-              onChangeText={setOldPassword}
+              value={updateName}
+              onChangeText={setUpdateName}
             />
             <TextInput
               placeholder={user?.data?.client?.phone_number || user?.data?.user?.phone_number}
               style={styles.input}
-              // value={user?.data?.client?.phone_number || user?.data?.user?.phone_number}
-              onChangeText={setNewPassword}
+              value={updatePhoneNumber}
+              onChangeText={setUpdatePhoneNumber}
             />
             <TextInput
               placeholder={user?.data?.client?.email || user?.data?.user?.email}
               style={styles.input}
-              // value={user?.data?.client?.email || user?.data?.user?.email}
-              onChangeText={setConfirmPassword}
+              value={updateEmail}
+              onChangeText={setUpdateEmail}
             />
             {loading ? <View className="w-full rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 h-[3rem] bg-blue-400 mt-5 mb-2">
               <ActivityIndicator size={30} color="blue" />
             </View> :
-              <CustomButton title="حفظ" onPress={changePassword} className="mb-2" />}
-            <CustomButton title="إلغاء" onPress={() => setPasswordModalVisible(false)} />
+              <CustomButton title="حفظ" onPress={changePersonalData} className="mb-2" />}
+            <CustomButton title="إلغاء" onPress={() => setPersonalDataModalVisible(false)} />
           </View>
         </View>
       </Modal>
